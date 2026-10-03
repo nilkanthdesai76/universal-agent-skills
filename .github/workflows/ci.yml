@@ -27,8 +27,8 @@ jobs:
           test -f skills/iphone-duo-migrator/SKILL.md
           test -f skills/ci-cd-automation/SKILL.md
           test -f skills/code-hygiene-auditor/SKILL.md
-          test -f adapters/cursor/.cursorrules
-          test -f adapters/claude/CLAUDE.md
-          test -f adapters/windsurf/.windsurfrules
+          test -f adapters/cursor/.cursorrules.template
+          test -f adapters/claude/CLAUDE.md.template
+          test -f adapters/windsurf/.windsurfrules.template
           test -f assets/universal_agent_diagram.svg
           echo "All templates, skills, adapters, and diagrams validated successfully."
