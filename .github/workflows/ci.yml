@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    name: Markdown & Template Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Validate Markdown Files Exist
+        run: |
+          test -f templates/AGENTS.md
+          test -f templates/ARCHITECTURE.md
+          test -f templates/PRD.md
+          test -f templates/TESTING.md
+          test -f templates/CODE_STYLE.md
+          test -f templates/SECURITY.md
+          test -f templates/DESIGN_SYSTEM.md
+          test -f skills/token-optimizer/SKILL.md
+          test -f skills/codebase-bootstrap/SKILL.md
+          test -f skills/iphone-duo-migrator/SKILL.md
+          test -f skills/ci-cd-automation/SKILL.md
+          test -f skills/code-hygiene-auditor/SKILL.md
+          echo "All templates and skills validated successfully."
