@@ -1,0 +1,10 @@
+# Cursor Rules Template
+
+# 1. First-Pass Context
+Always consult `AGENTS.md` and `ARCHITECTURE.md` before reading code files.
+Read only relevant line ranges; do not load entire 500+ line files into context.
+
+# 2. Strict Invariants
+- Never commit secrets, private tokens, or hardcoded server URLs.
+- Always run the relevant test suite before completing turns.
+- Preserve existing comments, types, and architecture conventions.

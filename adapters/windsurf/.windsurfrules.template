@@ -1,0 +1,7 @@
+# Windsurf Rules Template
+
+## Directives
+- Check `AGENTS.md` for build/test commands before executing tasks.
+- Keep token usage low by reading only relevant file slices.
+- Do not add or commit secrets or private URLs.
+- Always run the project test command to verify changes.

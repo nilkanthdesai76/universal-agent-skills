@@ -1,0 +1,7 @@
+# Claude Code Rules Template
+
+## Instructions
+1. Read `AGENTS.md` and `ARCHITECTURE.md` first to locate modules.
+2. Minimize token consumption: use targeted greps and specific line ranges.
+3. Zero Secrets: Never output or commit API keys or private tokens.
+4. Verify all code changes by running tests.
