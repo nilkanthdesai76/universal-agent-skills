@@ -44,15 +44,26 @@ Copy these standardized templates from `templates/` into your project root:
 
 ---
 
-## 🧰 The 5 Universal Skills
+## 🧰 The 11 Universal Skills Suite (1,000+ Lines Each)
 
-All skills conform to the open `SKILL.md` standard and work across multiple agent platforms:
+Every skill is a production-grade operational manual (minimum 1,000 lines) with complete scenario catalogs, diagnostic trees, anti-patterns, and verifiable code recipes:
 
-1. **[`token-optimizer`](skills/token-optimizer/SKILL.md)**: Teaches agents how to navigate codebases with targeted symbol lookups and line-range slice viewing instead of loading entire files into context.
-2. **[`codebase-bootstrap`](skills/codebase-bootstrap/SKILL.md)**: Automatically inspects any undocumented repository and scaffolds the 7 essential documentation files.
-3. **[`iphone-duo-migrator`](skills/iphone-duo-migrator/SKILL.md)**: Step-by-step guidance for updating iOS apps for iPhone Duo foldable dual-screen guidelines (hinge avoidance, `ArrangementView`, replacing `UIScreen.main`).
-4. **[`ci-cd-automation`](skills/ci-cd-automation/SKILL.md)**: Scaffolds automated GitHub Actions CI workflows for Swift, TypeScript, Python, and Go with caching and status badges.
-5. **[`code-hygiene-auditor`](skills/code-hygiene-auditor/SKILL.md)**: Pre-commit secret scanning, strict concurrency validation, and clean git status checks.
+### 🍏 iOS & Apple Engineering
+1. **[`swift-concurrency-doctor`](skills/swift-concurrency-doctor/SKILL.md)**: Exhaustive manual for resolving Swift 6 strict concurrency errors, data races, actor isolation boundaries, `@Sendable` violations, reentrancy hazards, and legacy GCD bridges.
+2. **[`xcode-ci-doctor`](skills/xcode-ci-doctor/SKILL.md)**: Troubleshooting headless Apple CI runners (GitHub Actions `macos-14`/`15`, Xcode Cloud), project format compatibility (110 vs 70), signing bypass flags, shared scheme discovery, and hardware test skips.
+3. **[`swiftui-layout-debugger`](skills/swiftui-layout-debugger/SKILL.md)**: Runtime diagnostics for SwiftUI layout bugs, infinite update cycles (`Modifying state during view update`), safe area & notch invasions, and Dynamic Type scaling.
+4. **[`appstore-privacy-auditor`](skills/appstore-privacy-auditor/SKILL.md)**: App Store pre-flight compliance audits: Apple Required Reason APIs (`UserDefaults`, timestamps, disk space), `PrivacyInfo.xcprivacy` generation, and ATT validation.
+5. **[`iphone-duo-migrator`](skills/iphone-duo-migrator/SKILL.md)**: Dual-screen and foldable adaptation protocol: physical hinge crease avoidance, `ArrangementView` multi-posture state machines, and `UIScreen.main` deprecation remediation.
+
+### 🧠 Core Agent Operations & Navigation
+6. **[`token-optimizer`](skills/token-optimizer/SKILL.md)**: Mathematical token budgeting, line-range slice viewing, and AST symbol lookup rules that slash context window consumption by up to 80%.
+7. **[`codebase-bootstrap`](skills/codebase-bootstrap/SKILL.md)**: Automated technology stack detection and scaffolding of the 7 codebase documentation pillars for unmapped repositories.
+8. **[`ci-cd-automation`](skills/ci-cd-automation/SKILL.md)**: Resilient GitHub Actions CI/CD scaffolding across Swift, TypeScript, Python, and Go with caching and status badges.
+
+### 🛠️ Developer Hygiene & Security
+9. **[`git-atomic-curator`](skills/git-atomic-curator/SKILL.md)**: Transforms sprawling multi-file changes into clean, atomic, bisect-safe Conventional Commits.
+10. **[`zero-secret-sanitizer`](skills/zero-secret-sanitizer/SKILL.md)**: Pre-commit regex scanning for 15+ secret types, `.env.example` scaffolding, and git history purification.
+11. **[`code-hygiene-auditor`](skills/code-hygiene-auditor/SKILL.md)**: Zero-warning compilation enforcement, working tree cleanliness, and pre-release audits.
 
 ---
 
