@@ -27,6 +27,12 @@ jobs:
           test -f skills/iphone-duo-migrator/SKILL.md
           test -f skills/ci-cd-automation/SKILL.md
           test -f skills/code-hygiene-auditor/SKILL.md
+          test -f skills/swift-concurrency-doctor/SKILL.md
+          test -f skills/xcode-ci-doctor/SKILL.md
+          test -f skills/swiftui-layout-debugger/SKILL.md
+          test -f skills/appstore-privacy-auditor/SKILL.md
+          test -f skills/git-atomic-curator/SKILL.md
+          test -f skills/zero-secret-sanitizer/SKILL.md
           test -f adapters/cursor/.cursorrules.template
           test -f adapters/claude/CLAUDE.md.template
           test -f adapters/windsurf/.windsurfrules.template
