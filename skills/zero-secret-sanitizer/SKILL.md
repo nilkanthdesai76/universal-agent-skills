@@ -1,7 +1,7 @@
 ---
 name: zero-secret-sanitizer
 description: >-
-  Operational protocol for scanning, detecting, remediating, and preventing secrets, API keys, private tokens, passwords, and sensitive URLs from leaking into git commits, config files, or public repositories. Minimum 1000 lines of regex patterns, remediation scripts, and git history scrubbing procedures.
+  Operational protocol for scanning, detecting, and remediating leaked secrets and credentials. Use when: scanning working directories or staged changes for hardcoded credentials (OpenAI, GitHub, AWS, Stripe, database passwords, private keys), generating safe .env.example templates, stripping personal access tokens from .git/config remote URLs, or scrubbing accidental secrets from git history before public release.
 ---
 
 # Zero-Secret Sanitizer (Credential Protection & History Purification) 🔒🛡️

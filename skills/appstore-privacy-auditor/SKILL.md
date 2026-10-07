@@ -1,7 +1,7 @@
 ---
 name: appstore-privacy-auditor
 description: >-
-  Operational protocol for conducting comprehensive App Store submission pre-flight audits: Apple Required Reason APIs scanning, PrivacyInfo.xcprivacy manifest generation, App Tracking Transparency (ATT) validation, and entitlement sanitization. Minimum 1000 lines of official reason codes, regex scanners, XML templates, and resolution steps.
+  Operational protocol for conducting comprehensive App Store submission pre-flight compliance audits. Use when: preparing an iOS/macOS/watchOS app for App Store submission, resolving rejection notice ITMS-91053, scanning codebases for Apple Required Reason APIs (UserDefaults, file modification timestamps, system boot time, disk space), generating or updating PrivacyInfo.xcprivacy manifests with valid reason codes, auditing App Tracking Transparency (ATT) and NSUserTrackingUsageDescription, or sanitizing release entitlements.
 ---
 
 # App Store Privacy & Compliance Auditor 🛡️📋

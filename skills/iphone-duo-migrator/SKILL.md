@@ -1,7 +1,7 @@
 ---
 name: iphone-duo-migrator
 description: >-
-  Operational protocol for adapting iOS and SwiftUI applications to foldable dual-screen architectures (iPhone Duo / dual display hardware). Minimum 1000 lines of physical hinge geometry avoidance, ArrangementView layout patterns, posture state machines, and UIScreen.main deprecation remediation.
+  Operational protocol for adapting iOS and SwiftUI applications to foldable and dual-screen hardware architectures. Use when: modernizing apps for foldable devices (iPhone Duo), preventing UI elements from being occluded by the physical center hinge, implementing dynamic posture state machines (flat, half-folded, dual portrait, dual landscape), replacing deprecated UIScreen.main.bounds with scene geometry, or ensuring graceful single-screen fallbacks.
 ---
 
 # iPhone Duo Migrator (Dual-Screen & Foldable Adaptation) 📱📖

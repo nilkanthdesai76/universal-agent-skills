@@ -1,7 +1,7 @@
 ---
 name: xcode-ci-doctor
 description: >-
-  Operational troubleshooting manual for debugging and resolving Xcode, xcodebuild, and Apple headless CI/CD pipeline failures across GitHub Actions, GitLab CI, and Xcode Cloud. Covers project format compatibility (110 vs 70), code signing bypasses, missing shared schemes, headless simulator destinations, and hardware-accelerated test skips. Minimum 1000 lines of exhaustive scenarios, flags, scripts, and repair procedures.
+  Operational troubleshooting manual for debugging Apple platforms and Xcode CI/CD pipelines. Use when: resolving xcodebuild failures or exit code 65 on GitHub Actions (macos-14/macos-15), fixing 'project format version 110 is not supported' errors by downgrading to objectVersion 70, bypassing headless code signing requirements (CODE_SIGNING_ALLOWED=NO), locating unshared schemes in xcshareddata, setting up simulator destination specifiers, or implementing XCTSkipIf for hardware-dependent tests (Metal/CoreML/Vision) on cloud virtualization VMs.
 ---
 
 # Xcode CI Doctor (Headless Apple Pipeline Troubleshooting) 🍏🛠️

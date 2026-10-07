@@ -1,7 +1,7 @@
 ---
 name: swift-concurrency-doctor
 description: >-
-  Exhaustive operational manual and clinical diagnostic guide for resolving Swift 6 strict concurrency errors, data races, actor isolation boundaries, Sendable conformance violations, reentrancy hazards, and legacy GCD bridging. Built with comprehensive real-world scenarios, complete code examples, and formal verification proofs.
+  Operational manual and clinical diagnostic guide for Swift 6 strict concurrency. Use when: resolving Swift 6 concurrency compiler errors or warnings (-strict-concurrency=complete), diagnosing data races, fixing Sendable conformance violations across actor boundaries, addressing @MainActor isolation hops, debugging actor reentrancy state mutations, bridging legacy delegate patterns or callbacks to AsyncStream, or replacing legacy DispatchQueue.main.async with structured tasks.
 ---
 
 # Swift Concurrency Doctor (Swift 6 & Strict Concurrency Manual) 🩺⚡️

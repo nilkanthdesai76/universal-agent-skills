@@ -1,7 +1,7 @@
 ---
 name: code-hygiene-auditor
 description: >-
-  Operational protocol for conducting comprehensive pre-commit code quality, security, and repository hygiene audits. Minimum 1000 lines of secret scanning algorithms, compiler warning zero-tolerance rules, working tree sanitization, and commit structuring procedures.
+  Operational protocol for conducting comprehensive pre-commit quality, security, and repository hygiene audits. Use when: performing pre-commit verification, verifying zero compiler warnings (-warnings-as-errors), ensuring no untracked scratch files, test binaries, or .DS_Store files linger in the working tree, auditing .gitignore coverage, and verifying clean test suite passes before concluding tasks.
 ---
 
 # Code Hygiene Auditor (Pre-Commit Quality & Security Verification) 🧹🔍

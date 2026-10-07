@@ -1,7 +1,7 @@
 ---
 name: ci-cd-automation
 description: >-
-  Operational protocol for designing, generating, and maintaining resilient GitHub Actions CI/CD workflows across Swift, TypeScript, Python, and Go. Minimum 1000 lines of runner matrices, caching strategies, Xcode project format compatibility, hardware test skips, and status badge maintenance.
+  Operational protocol for designing, generating, and maintaining resilient Continuous Integration workflows. Use when: scaffolding or fixing GitHub Actions or GitLab CI pipelines for Swift, iOS, macOS, TypeScript, Python, or Go projects, configuring dependency caching (.build, node_modules, pip), setting up concurrency cancellation groups, configuring Xcode runner environments, or linking CI status badges to README.md.
 ---
 
 # CI/CD Automation (Continuous Integration Architecture) 🚀⚙️

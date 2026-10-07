@@ -1,7 +1,7 @@
 ---
 name: codebase-bootstrap
 description: >-
-  Operational protocol for inspecting undocumented repositories, auto-detecting technology stacks, and scaffolding the 7 essential codebase documentation pillars (AGENTS.md, ARCHITECTURE.md, PRD.md, TESTING.md, CODE_STYLE.md, SECURITY.md, DESIGN_SYSTEM.md). Minimum 1000 lines of heuristics, file templates, monorepo strategies, and diagnostic checklists.
+  Operational protocol for inspecting undocumented repositories, auto-detecting technology stacks, and scaffolding the 7 codebase documentation pillars. Use when: entering an undocumented or unfamiliar repository, setting up an agent-friendly codebase architecture, auto-generating AGENTS.md with verified build/test commands, mapping folder taxonomies into ARCHITECTURE.md, or scaffolding PRD.md, TESTING.md, CODE_STYLE.md, SECURITY.md, and DESIGN_SYSTEM.md.
 ---
 
 # Codebase Bootstrap (Automated Architecture Scaffolding) 🏗️📚

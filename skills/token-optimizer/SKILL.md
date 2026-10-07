@@ -1,7 +1,7 @@
 ---
 name: token-optimizer
 description: >-
-  Operational protocol for minimizing LLM token consumption, eliminating context window bloat, enforcing surgical file slicing, and leveraging codebase-first documentation architecture. Minimum 1000 lines of token economics, mathematical budgeting rules, symbol grepping patterns, AST navigation, and anti-patterns.
+  Operational protocol for minimizing LLM token consumption and context window bloat during agent coding workflows. Use when: exploring large codebases, inspecting functions, classes, or structs without reading entire files, performing line-range slice viewing (StartLine/EndLine), budgeting context windows for multi-step reasoning, or avoiding context eviction and reasoning degradation on long coding sessions.
 ---
 
 # Token Optimizer (LLM Context Economics & Surgical Navigation) ⚡️🧠

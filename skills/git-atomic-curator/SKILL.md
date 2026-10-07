@@ -1,7 +1,7 @@
 ---
 name: git-atomic-curator
 description: >-
-  Operational protocol for transforming sprawling, multi-file uncommitted working trees into clean, atomic, bisect-safe git commit histories following the Conventional Commits specification. Minimum 1000 lines of staging heuristics, commit taxonomies, interactive rebase strategies, and verification checks.
+  Operational protocol for structuring, staging, and committing git changes. Use when: staging multiple modified files across a repository, organizing messy uncommitted working trees into clean atomic commits, adhering to Conventional Commits (chore, feat, fix, refactor, test, docs, ci), ensuring every intermediate commit compiles for git bisect safety, or structuring pull request commit histories.
 ---
 
 # Git Atomic Curator (Commit Hygiene & History Engineering) 🌳⚡️

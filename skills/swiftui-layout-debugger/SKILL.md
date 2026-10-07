@@ -1,7 +1,7 @@
 ---
 name: swiftui-layout-debugger
 description: >-
-  Comprehensive diagnostic and refactoring protocol for resolving SwiftUI layout bugs, infinite view update loops ('Modifying state during view update'), clipping, safe area and notch geometry violations, and Dynamic Type accessibility scaling failures. Minimum 1000 lines of exhaustive scenarios, debugging recipes, and verified solutions.
+  Operational protocol for diagnosing and repairing SwiftUI layout anomalies and runtime rendering bugs. Use when: debugging SwiftUI layout glitches, eliminating 'Modifying state during view update' console warnings, resolving infinite body execution cycles, fixing clipping, overflow, or unexpected Spacer expansion, complying with MacBook notch and iPhone Dynamic Island safe areas, or supporting Dynamic Type accessibility text scaling.
 ---
 
 # SwiftUI Layout Debugger (Runtime Diagnostics & View Geometry) 🎨📐
