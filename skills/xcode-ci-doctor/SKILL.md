@@ -905,117 +905,165 @@ xcodebuild build \
 - Build succeeds in 12 seconds with zero code signing prompts.
 - Test suite executes cleanly without keychain unlock locks.
 
-## 8. Appendix: xcodebuild CLI Flag Dictionary
+## 8. Headless xcodebuild CLI Flags Reference
 
-- **Flag Specifier 001**: Advanced xcodebuild headless pipeline parameter #1. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 002**: Advanced xcodebuild headless pipeline parameter #2. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 003**: Advanced xcodebuild headless pipeline parameter #3. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 004**: Advanced xcodebuild headless pipeline parameter #4. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 005**: Advanced xcodebuild headless pipeline parameter #5. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 006**: Advanced xcodebuild headless pipeline parameter #6. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 007**: Advanced xcodebuild headless pipeline parameter #7. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 008**: Advanced xcodebuild headless pipeline parameter #8. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 009**: Advanced xcodebuild headless pipeline parameter #9. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 010**: Advanced xcodebuild headless pipeline parameter #10. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 011**: Advanced xcodebuild headless pipeline parameter #11. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 012**: Advanced xcodebuild headless pipeline parameter #12. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 013**: Advanced xcodebuild headless pipeline parameter #13. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 014**: Advanced xcodebuild headless pipeline parameter #14. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 015**: Advanced xcodebuild headless pipeline parameter #15. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 016**: Advanced xcodebuild headless pipeline parameter #16. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 017**: Advanced xcodebuild headless pipeline parameter #17. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 018**: Advanced xcodebuild headless pipeline parameter #18. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 019**: Advanced xcodebuild headless pipeline parameter #19. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 020**: Advanced xcodebuild headless pipeline parameter #20. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 021**: Advanced xcodebuild headless pipeline parameter #21. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 022**: Advanced xcodebuild headless pipeline parameter #22. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 023**: Advanced xcodebuild headless pipeline parameter #23. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 024**: Advanced xcodebuild headless pipeline parameter #24. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 025**: Advanced xcodebuild headless pipeline parameter #25. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 026**: Advanced xcodebuild headless pipeline parameter #26. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 027**: Advanced xcodebuild headless pipeline parameter #27. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 028**: Advanced xcodebuild headless pipeline parameter #28. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 029**: Advanced xcodebuild headless pipeline parameter #29. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 030**: Advanced xcodebuild headless pipeline parameter #30. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 031**: Advanced xcodebuild headless pipeline parameter #31. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 032**: Advanced xcodebuild headless pipeline parameter #32. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 033**: Advanced xcodebuild headless pipeline parameter #33. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 034**: Advanced xcodebuild headless pipeline parameter #34. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 035**: Advanced xcodebuild headless pipeline parameter #35. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 036**: Advanced xcodebuild headless pipeline parameter #36. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 037**: Advanced xcodebuild headless pipeline parameter #37. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 038**: Advanced xcodebuild headless pipeline parameter #38. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 039**: Advanced xcodebuild headless pipeline parameter #39. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 040**: Advanced xcodebuild headless pipeline parameter #40. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 041**: Advanced xcodebuild headless pipeline parameter #41. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 042**: Advanced xcodebuild headless pipeline parameter #42. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 043**: Advanced xcodebuild headless pipeline parameter #43. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 044**: Advanced xcodebuild headless pipeline parameter #44. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 045**: Advanced xcodebuild headless pipeline parameter #45. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 046**: Advanced xcodebuild headless pipeline parameter #46. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 047**: Advanced xcodebuild headless pipeline parameter #47. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 048**: Advanced xcodebuild headless pipeline parameter #48. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 049**: Advanced xcodebuild headless pipeline parameter #49. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 050**: Advanced xcodebuild headless pipeline parameter #50. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 051**: Advanced xcodebuild headless pipeline parameter #51. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 052**: Advanced xcodebuild headless pipeline parameter #52. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 053**: Advanced xcodebuild headless pipeline parameter #53. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 054**: Advanced xcodebuild headless pipeline parameter #54. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 055**: Advanced xcodebuild headless pipeline parameter #55. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 056**: Advanced xcodebuild headless pipeline parameter #56. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 057**: Advanced xcodebuild headless pipeline parameter #57. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 058**: Advanced xcodebuild headless pipeline parameter #58. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 059**: Advanced xcodebuild headless pipeline parameter #59. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 060**: Advanced xcodebuild headless pipeline parameter #60. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 061**: Advanced xcodebuild headless pipeline parameter #61. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 062**: Advanced xcodebuild headless pipeline parameter #62. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 063**: Advanced xcodebuild headless pipeline parameter #63. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 064**: Advanced xcodebuild headless pipeline parameter #64. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 065**: Advanced xcodebuild headless pipeline parameter #65. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 066**: Advanced xcodebuild headless pipeline parameter #66. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 067**: Advanced xcodebuild headless pipeline parameter #67. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 068**: Advanced xcodebuild headless pipeline parameter #68. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 069**: Advanced xcodebuild headless pipeline parameter #69. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 070**: Advanced xcodebuild headless pipeline parameter #70. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 071**: Advanced xcodebuild headless pipeline parameter #71. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 072**: Advanced xcodebuild headless pipeline parameter #72. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 073**: Advanced xcodebuild headless pipeline parameter #73. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 074**: Advanced xcodebuild headless pipeline parameter #74. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 075**: Advanced xcodebuild headless pipeline parameter #75. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 076**: Advanced xcodebuild headless pipeline parameter #76. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 077**: Advanced xcodebuild headless pipeline parameter #77. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 078**: Advanced xcodebuild headless pipeline parameter #78. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 079**: Advanced xcodebuild headless pipeline parameter #79. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 080**: Advanced xcodebuild headless pipeline parameter #80. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 081**: Advanced xcodebuild headless pipeline parameter #81. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 082**: Advanced xcodebuild headless pipeline parameter #82. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 083**: Advanced xcodebuild headless pipeline parameter #83. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 084**: Advanced xcodebuild headless pipeline parameter #84. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 085**: Advanced xcodebuild headless pipeline parameter #85. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 086**: Advanced xcodebuild headless pipeline parameter #86. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 087**: Advanced xcodebuild headless pipeline parameter #87. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 088**: Advanced xcodebuild headless pipeline parameter #88. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 089**: Advanced xcodebuild headless pipeline parameter #89. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 090**: Advanced xcodebuild headless pipeline parameter #90. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 091**: Advanced xcodebuild headless pipeline parameter #91. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 092**: Advanced xcodebuild headless pipeline parameter #92. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 093**: Advanced xcodebuild headless pipeline parameter #93. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 094**: Advanced xcodebuild headless pipeline parameter #94. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 095**: Advanced xcodebuild headless pipeline parameter #95. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 096**: Advanced xcodebuild headless pipeline parameter #96. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 097**: Advanced xcodebuild headless pipeline parameter #97. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 098**: Advanced xcodebuild headless pipeline parameter #98. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 099**: Advanced xcodebuild headless pipeline parameter #99. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 100**: Advanced xcodebuild headless pipeline parameter #100. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 101**: Advanced xcodebuild headless pipeline parameter #101. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 102**: Advanced xcodebuild headless pipeline parameter #102. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 103**: Advanced xcodebuild headless pipeline parameter #103. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 104**: Advanced xcodebuild headless pipeline parameter #104. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 105**: Advanced xcodebuild headless pipeline parameter #105. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 106**: Advanced xcodebuild headless pipeline parameter #106. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 107**: Advanced xcodebuild headless pipeline parameter #107. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 108**: Advanced xcodebuild headless pipeline parameter #108. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 109**: Advanced xcodebuild headless pipeline parameter #109. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 110**: Advanced xcodebuild headless pipeline parameter #110. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 111**: Advanced xcodebuild headless pipeline parameter #111. Optimizes compilation throughput and runner memory efficiency.
-- **Flag Specifier 112**: Advanced xcodebuild headless pipeline parameter #112. Optimizes compilation throughput and runner memory efficiency.
+| Flag / Parameter | Purpose in CI | Recommended CI Setting |
+| :--- | :--- | :--- |
+| `CODE_SIGNING_ALLOWED=NO` | Bypasses local and CI certificate signing requirements | Always set to `NO` on pull request and test workflows |
+| `CODE_SIGN_IDENTITY=""` | Clears signing identity override | Pass empty string `""` to prevent Xcode from searching keychain |
+| `CODE_SIGNING_REQUIRED=NO` | Disables codesign requirement checks | Always set to `NO` for headless unit testing |
+| `-derivedDataPath <path>` | Isolates build artifacts into repository local folder | Set to `.derivedData` to facilitate caching with actions/cache |
+| `-skipPackagePluginValidation` | Prevents Xcode 15/16 SPM command plugin trust dialog prompts | Always pass when using Swift packages with build tool plugins |
+| `-disableAutomaticPackageResolution` | Prevents xcodebuild from mutating `Package.resolved` during build | Pass when strict reproducible dependency locks are required |
+| `COMPILER_INDEX_STORE_ENABLE=NO` | Disables indexing of AST data that won't be reused | Saves 20–30% runner CPU time and speeds up CI builds |
+| `-parallel-testing-enabled YES` | Enables concurrent test runner workers on simulator images | Use on multi-core Mac runners to reduce test execution duration |
+| `-maximum-concurrent-test-device-destinations` | Caps simulator instances to avoid out-of-memory kernel panics | Recommended `2` on standard GitHub Actions `macos-14` runner |
+| `-only-testing:<Target>/<Suite>` | Runs a specific sub-suite instead of the full test target | Use for fast commit-stage verification loops |
+| `-skip-testing:<Target>/<Suite>` | Skips known flaky or hardware-dependent test suites | Use for temporary quarantine while investigating regressions |
+
+---
+
+## 9. xcodebuild Exit Codes Diagnostic Matrix
+
+| Exit Code | Common Root Cause | Surgical Remediation Command |
+| :---: | :--- | :--- |
+| **65** | Build failed (compilation error, code signing failure, or missing scheme) | Check `project.pbxproj` format version, verify scheme in `xcshareddata`, or pass `CODE_SIGNING_ALLOWED=NO` |
+| **66** | Invalid target or scheme specified | Run `xcodebuild -list` to inspect available shared targets and schemes |
+| **70** | Simulator destination unreachable or runtime crashed | Run `xcrun simctl list devices` to verify runtime availability; reboot simulator via `xcrun simctl shutdown all` |
+| **74** | Missing or corrupted developer directory | Run `sudo xcode-select -s /Applications/Xcode_<version>.app/Contents/Developer` |
+
+---
+
+## 10. Operational CI Health Checklist
+
+Before closing any Apple CI setup or maintenance task, verify:
+
+- [ ] All `.xcscheme` files are committed under `xcshareddata/xcschemes/` (not in `xcuserdata/`).
+- [ ] `objectVersion` in `project.pbxproj` is `<= 70` for compatibility with Xcode 16 runners.
+- [ ] Headless signing bypass flags (`CODE_SIGNING_ALLOWED=NO`) are in place for PR workflows.
+- [ ] Tests depending on Neural Engine or Metal hardware use `try XCTSkipIf()` when running under `CI=true`.
+- [ ] GitHub Actions concurrency group is configured with `cancel-in-progress: true` to prevent runner saturation.
+
+---
+
+## 11. Production CI Automation Runbooks
+
+### Runbook 1: Automated Test Failure Extraction via `xcresulttool`
+
+When headless tests fail in CI, raw Xcode logs can exceed 50,000 lines. Use `xcresulttool` to extract exact test failures and assertion diagnostics into machine-readable JSON or markdown:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+RESULT_BUNDLE="build/TestResults.xcresult"
+
+if [ ! -d "$RESULT_BUNDLE" ]; then
+  echo "❌ Error: Test result bundle not found at $RESULT_BUNDLE"
+  exit 1
+fi
+
+echo "🔍 Parsing failures from $RESULT_BUNDLE..."
+
+# Export test summaries as JSON
+xcrun xcresulttool get --format json --path "$RESULT_BUNDLE" > test_summary.json
+
+# Extract failure messages using jq
+FAILURES=$(jq -r '
+  .actions._values[]? |
+  .actionResult.issues.testFailureSummaries._values[]? |
+  "• \(.testCaseName._value): \(.message._value) (\(.documentLocationInCreatingWorkspace.url._value // "unknown location"))"
+' test_summary.json)
+
+if [ -n "$FAILURES" ]; then
+  echo "🚨 Identified Test Failures:"
+  echo "$FAILURES"
+  # Write to GitHub Actions step summary if running in CI
+  if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+    echo "### ❌ Xcode Test Failures" >> "$GITHUB_STEP_SUMMARY"
+    echo "$FAILURES" >> "$GITHUB_STEP_SUMMARY"
+  fi
+  exit 1
+else
+  echo "✅ All tests passed according to xcresult bundle."
+fi
+```
+
+### Runbook 2: Optimized GitHub Actions Caching for SPM & DerivedData
+
+Prevent SPM re-resolution and cold rebuilds across workflow runs with targeted cache keys:
+
+```yaml
+- name: Cache SPM Dependencies
+  uses: actions/cache@v4
+  with:
+    path: |
+      .build
+      ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+    key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved', '**/*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+    restore-keys: |
+      ${{ runner.os }}-spm-
+
+- name: Cache Build Artifacts
+  uses: actions/cache@v4
+  with:
+    path: build/DerivedData
+    key: ${{ runner.os }}-deriveddata-${{ github.sha }}
+    restore-keys: |
+      ${{ runner.os }}-deriveddata-
+```
+
+### Runbook 3: Headless Ephemeral Keychain Management for Code Signing
+
+When production signing is required on headless runners (e.g. for TestFlight or release builds), manage the temporary keychain lifecycle cleanly:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+KEYCHAIN_NAME="ci-temp.keychain-db"
+KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
+
+cleanup() {
+  echo "🧹 Cleaning up ephemeral keychain..."
+  security delete-keychain "$KEYCHAIN_NAME" 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
+
+# 1. Create temporary keychain
+security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+security set-keychain-settings -lut 21600 "$KEYCHAIN_NAME"
+security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+
+# 2. Add to search list
+security list-keychains -d user -s "$KEYCHAIN_NAME" $(security list-keychains -d user | tr -d '"')
+
+# 3. Import certificates (base64-encoded secret from env)
+echo "$APPLE_CERTIFICATE_BASE64" | base64 --decode > /tmp/cert.p12
+security import /tmp/cert.p12 -k "$KEYCHAIN_NAME" -P "$APPLE_CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/xcodebuild
+rm -f /tmp/cert.p12
+
+# 4. Partition list authorization for codesign
+security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+
+echo "🔐 Ephemeral keychain ready for signed build execution."
+```
+
+### Runbook 4: Simulator Pre-Warming & Parallel Test Sharding
+
+```bash
+# Pre-warm target simulator before test execution
+DEVICE_NAME="iPhone 16"
+OS_VERSION="iOS-18-0"
+
+UDID=$(xcrun simctl list devices available | grep "$DEVICE_NAME" | grep -v "unavailable" | head -n 1 | grep -o -E '[0-9A-F-]{36}')
+
+if [ -z "$UDID" ]; then
+  echo "⚠️ Target simulator not found, creating new instance..."
+  UDID=$(xcrun simctl create "$DEVICE_NAME" "com.apple.CoreSimulator.SimDeviceType.iPhone-16" "com.apple.CoreSimulator.SimRuntime.$OS_VERSION")
+fi
+
+echo "🚀 Booting simulator $UDID..."
+xcrun simctl boot "$UDID" || true
+xcrun simctl bootstatus "$UDID" -b
+```

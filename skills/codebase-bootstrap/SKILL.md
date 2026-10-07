@@ -6,1004 +6,385 @@ description: >-
 
 # Codebase Bootstrap (Automated Architecture Scaffolding) 🏗️📚
 
-The definitive operational manual for AI coding agents tasked with ingesting undocumented or legacy codebases, analyzing structural taxonomy, and generating the 7 documentation pillars that guide future agent interactions.
+The definitive operational manual for AI coding agents tasked with ingesting undocumented or legacy repositories, discovering build invariants, analyzing structural taxonomy, and scaffolding the 7 standardized documentation pillars that make codebases permanently agent-friendly.
 
 ---
 
 ## 1. Executive Summary & Core Philosophy
 
-When an AI agent enters an unmapped repository, it spends massive amounts of time probing shell commands, guessing build tools, and making unverified assumptions. By bootstrapping the 7 standardized documentation pillars, the agent leaves the codebase in a permanently agent-friendly state.
+When an AI coding assistant enters an unmapped repository, it typically spends excessive tokens probing shell commands, guessing build tools, and making unverified assumptions. By bootstrapping the 7 standardized documentation pillars, the agent provides ground-truth operating instructions for itself and future agents.
 
-1. **Failure Modes of AI Agents**:
-   - Commencing feature work on an unknown codebase without discovering how tests are run.
-   - Writing generic documentation files that don't include executable shell commands.
-   - Missing monorepo boundaries and creating conflicting root configurations.
+### Failure Modes of Naive Agents
+1. **Speculative Probing**: Running blind directory scans and greps across hundreds of files without checking for existing manifest files.
+2. **Missing Ground-Truth Commands**: Writing generic README documentation that omits executable, verified shell commands for building and testing.
+3. **Monorepo Boundary Confusion**: Overlooking multi-package or monorepo boundaries, creating conflicting root configurations that break child projects.
+4. **Ignoring Hidden Conventions**: Failing to inspect existing linters (`.swiftlint.yml`, `.eslintrc`, `ruff.toml`) or CI workflows (`.github/workflows/`), leading to inconsistent code style suggestions.
 
-2. **The Bootstrapper's Mandate**:
-   - **Stack Auto-Detection**: Inspect manifest files (`Package.swift`, `package.json`, `Cargo.toml`, `go.mod`, `pyproject.toml`, `Makefile`) to identify the exact toolchain.
-   - **Executable Ground Truth**: Every generated `AGENTS.md` MUST contain exact, tested build, test, and lint commands.
-   - **Directory Taxonomy Mapping**: `ARCHITECTURE.md` must accurately map which folders own which capabilities.
+### The Bootstrapper's Mandate
+- **Rule 1 (Inspect Manifests First)**: Never guess a project's stack. Inspect root and subfolder manifests (`Package.swift`, `package.json`, `Cargo.toml`, `go.mod`, `pyproject.toml`, `Makefile`) to identify the toolchain with 100% certainty.
+- **Rule 2 (Executable Invariants)**: Every `AGENTS.md` generated MUST contain real, tested build, test, and run commands verified against the local environment.
+- **Rule 3 (Structural Mapping)**: Every `ARCHITECTURE.md` MUST provide a concrete directory tree and document which folder owns which responsibility.
+- **Rule 4 (Zero Artificial Padding)**: All generated documentation must contain concrete, domain-specific information, not generic placeholders.
 
 ---
 
-## 2. Technology Stack Auto-Detection Matrix
+## 2. Technology Stack Auto-Detection Protocol
 
+Execute this detection sequence upon entering any undocumented repository:
+
+```bash
+# Step 1: Detect package manifests and build systems
+find . -maxdepth 2 \( \
+  -name "Package.swift" -o \
+  -name "*.xcodeproj" -o \
+  -name "*.xcworkspace" -o \
+  -name "package.json" -o \
+  -name "Cargo.toml" -o \
+  -name "pyproject.toml" -o \
+  -name "requirements.txt" -o \
+  -name "go.mod" -o \
+  -name "Makefile" -o \
+  -name "docker-compose.yml" -o \
+  -name "pubspec.yaml" \
+\) -not -path "*/.*" -not -path "*/node_modules/*"
 ```
-+-------------------------------------------------------------------------+
-|                  STACK RECOGNITION & COMMAND EXTRACTION                 |
-+-------------------------------------------------------------------------+
-| Manifest File   | Identified Tech Stack  | Extracted Fast Test Command  |
-+-----------------+------------------------+------------------------------+
-| Package.swift   | Swift / iOS / macOS    | swift test -v                |
-| package.json    | Node / TypeScript      | npm test OR pnpm test        |
-| Cargo.toml      | Rust                   | cargo test                   |
-| pyproject.toml  | Python                 | pytest -v                    |
-| go.mod          | Go                     | go test ./...                |
-| Makefile        | Polyglot / Systems     | make test                    |
-+-------------------------------------------------------------------------+
-```
+
+### Detection Matrix & Command Extraction
+
+| Manifest File | Detected Technology | Command Discovery Target | Primary Fast Test Command |
+| :--- | :--- | :--- | :--- |
+| `Package.swift` | Swift / Apple Package | Inspect `targets` and `dependencies` | `swift test -v` |
+| `*.xcodeproj` / `*.xcworkspace` | Xcode Application (iOS/macOS) | Inspect shared schemes in `xcshareddata` | `xcodebuild test -scheme <Scheme> -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO` |
+| `package.json` | Node.js / TypeScript / React | Inspect `scripts` object in `package.json` | `npm test` or `pnpm test` or `bun test` |
+| `pyproject.toml` | Python (Modern) | Inspect `[tool.pytest]`, `[tool.poetry]` | `pytest -v` |
+| `requirements.txt` | Python (Legacy) | Inspect virtualenv and test framework | `pytest` or `python -m unittest` |
+| `Cargo.toml` | Rust | Inspect `[[bin]]` and `[dependencies]` | `cargo test` |
+| `go.mod` | Go | Inspect module path and Go version | `go test -v ./...` |
+| `pubspec.yaml` | Flutter / Dart | Inspect `dependencies` and SDK constraints | `flutter test` |
+| `Makefile` | Polyglot / Systems | Inspect `test:`, `build:`, `lint:` targets | `make test` |
+| `docker-compose.yml` | Multi-Container Stack | Inspect `services:` and healthchecks | `docker compose ps` / `docker compose up -d` |
 
 ---
 
 ## 3. The 7 Documentation Pillars Specification
 
-1. **`AGENTS.md`**: Operational manual, exact build/run/test commands, invariants, verification tricks.
-2. **`ARCHITECTURE.md`**: Folder taxonomy, module boundaries, data flow diagrams.
-3. **`PRD.md`**: Problem statement, core user stories, acceptance criteria.
-4. **`TESTING.md`**: Fast unit tests, mocking conventions, CI execution instructions.
-5. **`CODE_STYLE.md`**: Lint rules, formatting guidelines, language idioms.
-6. **`SECURITY.md`**: Zero-secret policy, credential management, input validation.
-7. **`DESIGN_SYSTEM.md`**: Colors, typography, spacing tokens, cross-platform styling.
+Every bootstrapped project should contain these 7 standardized documentation files:
+
+```
+project-root/
+├── AGENTS.md               # 1. Operational manual for AI agents (build/test/run commands)
+├── ARCHITECTURE.md         # 2. Directory taxonomy, module boundaries, data flow diagrams
+├── PRD.md                  # 3. Product requirements, user stories, acceptance criteria
+├── TESTING.md              # 4. Fast unit test commands, mock patterns, regression rules
+├── CODE_STYLE.md           # 5. Formatting, linters, naming conventions, language idioms
+├── SECURITY.md             # 6. Zero-secret policies, sanitization, credential handling
+└── DESIGN_SYSTEM.md        # 7. UI tokens, typography, dark mode, spacing scales
+```
 
 ---
 
-## 4. 20+ Real-World Bootstrap Scenarios & Case Studies
+## 4. Production-Grade Templates for the 7 Pillars
 
-### Case Study 01: Bootstrapping Legacy Stack #1
+### Pillar 1: Production `AGENTS.md` Template
 
-#### Repository State
-An undocumented repository containing service module #1 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
 ```markdown
-# AGENTS.md for Module 1
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module1Tests`
+# AGENTS.md
+
+Operational manual and ground-truth invariants for AI coding assistants working on this repository.
+
+## 1. Project Overview
+- **Name**: [Project Name]
+- **Platform**: [e.g. macOS 14+, iOS 16+, Node 20+, Python 3.11+]
+- **Architecture**: [e.g. Swift Package, Next.js App Router, FastAPI Microservice]
+
+## 2. Verified Execution Commands
+Commands must be run from the repository root:
+
+- **Build**:
+  ```bash
+  [e.g. swift build -v / npm run build / cargo build]
+  ```
+- **Fast Test (Run after every edit)**:
+  ```bash
+  [e.g. swift test --filter <Target> / npm test -- --watch=false / pytest tests/unit]
+  ```
+- **Lint & Format**:
+  ```bash
+  [e.g. swiftlint / npm run lint / ruff check .]
+  ```
+
+## 3. Critical Invariants
+- Invariant 1: [e.g. Zero external dependencies beyond standard library]
+- Invariant 2: [e.g. Strict concurrency enabled: all types crossing actor boundaries must be Sendable]
+- Invariant 3: [e.g. Zero secrets: all credentials must use .env.example placeholders]
+
+## 4. Verification Protocol
+Before marking any task complete:
+1. Run the fast test command and verify 100% green pass.
+2. Verify `git status` has zero untracked artifacts or modified files outside scope.
+3. Check compiler output for zero warnings.
 ```
 
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
+---
 
+### Pillar 2: Production `ARCHITECTURE.md` Template
 
-### Case Study 02: Bootstrapping Legacy Stack #2
-
-#### Repository State
-An undocumented repository containing service module #2 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
 ```markdown
-# AGENTS.md for Module 2
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module2Tests`
+# ARCHITECTURE.md
+
+Directory taxonomy, module boundaries, and data flow architecture.
+
+## 1. Directory Structure
+```text
+Sources/
+├── Models/              # Immutable data structures, DTOs, domain entities
+├── Services/            # Business logic, actors, network clients, storage engines
+├── UI/                  # Presentation layer, views, view models, design tokens
+└── Utilities/           # Thread-safe primitives, extensions, logging helpers
+Tests/
+├── UnitTests/           # Fast, deterministic isolated tests (< 2s execution)
+└── MockFixtures/        # In-memory test fixtures and protocol stubs
 ```
 
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 03: Bootstrapping Legacy Stack #3
-
-#### Repository State
-An undocumented repository containing service module #3 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
+## 2. Component Boundaries & Data Flow
+```mermaid
+flowchart TD
+    UI[UI Presentation Layer] -->|User Actions| VM[ViewModel / State Store]
+    VM -->|Async Calls| Service[Actor-Isolated Services]
+    Service -->|Network / Disk| Engine[Storage & Network Engines]
+    Engine -->|Immutable Models| VM
+    VM -->|State Updates| UI
 ```
 
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
+## 3. Module Ownership Rules
+- `Models/` must never import UI frameworks (`SwiftUI`, `UIKit`, `React`).
+- `Services/` must be decoupled from UI lifecycle and isolated to custom actors.
+- `UI/` must observe state through view models or observable stores; never instantiate raw network clients directly inside views.
+```
 
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
+---
+
+### Pillar 3: Production `PRD.md` Template
+
 ```markdown
-# AGENTS.md for Module 3
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module3Tests`
+# PRD.md — Product Requirements Document
+
+## 1. Problem Statement
+Describe the core user problem this software solves.
+
+## 2. Target Audience & Personas
+- **Primary Persona**: [e.g. iOS Engineers, Self-Hosters, Mobile App Users]
+- **Core Need**: [e.g. Fast document scanning without cloud dependency]
+
+## 3. Functional Requirements (User Stories)
+- **US-01**: As a user, I want to scan documents offline so that my private data never leaves my device.
+  - *Acceptance Criteria*: Processing takes < 200ms on Apple Silicon; outputs searchable PDF.
+- **US-02**: As a user, I want biometric locking so that unauthorized users cannot view my documents.
+  - *Acceptance Criteria*: Face ID / Touch ID prompt triggers on app backgrounding; fallback to Keychain PIN.
+
+## 4. Non-Functional Requirements
+- **Performance**: Launch time < 400ms; memory footprint < 60MB.
+- **Privacy**: Zero analytics tracking; zero third-party telemetry.
+- **Reliability**: Graceful offline degradation; zero crash tolerance.
 ```
 
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
+---
 
+### Pillar 4: Production `TESTING.md` Template
 
-### Case Study 04: Bootstrapping Legacy Stack #4
-
-#### Repository State
-An undocumented repository containing service module #4 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
 ```markdown
-# AGENTS.md for Module 4
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module4Tests`
-```
+# TESTING.md
 
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
+Testing conventions, test suites, and mock patterns.
 
-
-### Case Study 05: Bootstrapping Legacy Stack #5
-
-#### Repository State
-An undocumented repository containing service module #5 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
+## 1. Fast Test Execution
+Run unit tests locally before pushing:
 ```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
+[Test command, e.g. swift test --parallel / npm test]
 ```
 
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
+## 2. Testing Philosophy
+- **Deterministic**: Tests must never rely on real network connections or `Task.sleep` delays.
+- **Isolated**: Every test must run independently without shared mutable state.
+- **Fast**: The unit test suite must execute in under 5 seconds.
 
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
+## 3. Mocking Patterns
+Always use protocol-based stubs or `URLProtocol` interception:
+```swift
+// Example Protocol Stub
+protocol NetworkSessionProtocol: Sendable {
+    func data(from url: URL) async throws -> (Data, URLResponse)
+}
+
+final class MockNetworkSession: NetworkSessionProtocol {
+    var stubbedData: Data = Data()
+    func data(from url: URL) async throws -> (Data, URLResponse) {
+        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        return (stubbedData, response)
+    }
+}
+```
+```
+
+---
+
+### Pillar 5: Production `CODE_STYLE.md` Template
+
 ```markdown
-# AGENTS.md for Module 5
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module5Tests`
+# CODE_STYLE.md
+
+Formatting standards, linters, naming conventions, and language idioms.
+
+## 1. Naming Conventions
+- **Types**: PascalCase (`DocumentScanner`, `UserProfile`)
+- **Functions & Variables**: camelCase (`fetchUserProfile`, `activeSession`)
+- **Constants**: camelCase (`maximumRetryCount`, `defaultTimeout`)
+- **Protocols**: Adjectives or nouns ending in -able or -Protocol (`Sendable`, `SyncEngineProtocol`)
+
+## 2. Formatting & Linters
+- Indentation: 4 spaces (Swift, Python) / 2 spaces (TypeScript, YAML)
+- Max line length: 120 characters
+- Trailing commas in multi-line lists/arrays
+- Linter invocation:
+  ```bash
+  [Lint command, e.g. swiftlint --strict / npm run lint / ruff check .]
+  ```
+
+## 3. Idiomatic Rules
+- Prefer value types (`struct`, `enum`) over reference types (`class`) unless identity or reference sharing is required.
+- Handle all errors explicitly with custom error enums conforming to `Error` and `LocalizedError`.
+- Never use force unwrap (`!`) in production code paths; use `guard let` or `if let`.
 ```
 
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
+---
 
+### Pillar 6: Production `SECURITY.md` Template
 
-### Case Study 06: Bootstrapping Legacy Stack #6
+```markdown
+# SECURITY.md
 
-#### Repository State
-An undocumented repository containing service module #6 was opened by an agent. No README or documentation existed.
+Security policies, secret management, and vulnerability reporting.
 
-#### Step 1: Toolchain Identification
+## 1. Zero-Secret Policy
+- Never commit real API keys, passwords, private tokens, or staging URLs.
+- Always provide a sanitized `.env.example` file with placeholder values.
+- Verify that `.env` and `.env.local` are listed in `.gitignore`.
+
+## 2. Pre-Commit Secret Scanning
+Run before every commit:
 ```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
+git grep -nE "(ghp_[a-zA-Z0-9]{36}|sk-[a-zA-Z0-9]{32,}|AKIA[0-9A-Z]{16})" || echo "No secrets found"
 ```
 
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
+## 3. Vulnerability Reporting
+To report a security vulnerability, please email security@[domain] rather than opening a public issue.
+```
 
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
+---
+
+### Pillar 7: Production `DESIGN_SYSTEM.md` Template
+
 ```markdown
-# AGENTS.md for Module 6
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module6Tests`
+# DESIGN_SYSTEM.md
+
+Visual design tokens, typography scales, colors, and layout geometry.
+
+## 1. Color Palette
+- **Primary Accent**: `#38bdf8` (Cyan / Sky Blue)
+- **Background (Dark)**: `#0a0c10`
+- **Surface Card (Dark)**: `#141b26` with border `#1e293b`
+- **Text Primary**: `#f8fafc`
+- **Text Muted**: `#94a3b8`
+
+## 2. Typography Scale
+- **Display Large**: 32pt / Bold / Rounded
+- **Headline**: 20pt / SemiBold
+- **Body**: 15pt / Regular
+- **Caption / Footnote**: 12pt / Medium
+
+## 3. Touch Targets & Spacing
+- Minimum touch target: 44×44 pt (Apple HIG compliant)
+- Standard margins: 16pt (Mobile) / 24pt (Tablet / Desktop)
+- Standard corner radius: 12pt (Cards) / 8pt (Buttons) / 999pt (Pills)
 ```
 
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 07: Bootstrapping Legacy Stack #7
-
-#### Repository State
-An undocumented repository containing service module #7 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 7
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module7Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 08: Bootstrapping Legacy Stack #8
-
-#### Repository State
-An undocumented repository containing service module #8 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 8
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module8Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 09: Bootstrapping Legacy Stack #9
-
-#### Repository State
-An undocumented repository containing service module #9 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 9
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module9Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 10: Bootstrapping Legacy Stack #10
-
-#### Repository State
-An undocumented repository containing service module #10 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 10
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module10Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 11: Bootstrapping Legacy Stack #11
-
-#### Repository State
-An undocumented repository containing service module #11 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 11
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module11Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 12: Bootstrapping Legacy Stack #12
-
-#### Repository State
-An undocumented repository containing service module #12 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 12
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module12Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 13: Bootstrapping Legacy Stack #13
-
-#### Repository State
-An undocumented repository containing service module #13 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 13
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module13Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 14: Bootstrapping Legacy Stack #14
-
-#### Repository State
-An undocumented repository containing service module #14 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 14
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module14Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 15: Bootstrapping Legacy Stack #15
-
-#### Repository State
-An undocumented repository containing service module #15 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 15
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module15Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 16: Bootstrapping Legacy Stack #16
-
-#### Repository State
-An undocumented repository containing service module #16 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 16
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module16Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 17: Bootstrapping Legacy Stack #17
-
-#### Repository State
-An undocumented repository containing service module #17 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 17
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module17Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 18: Bootstrapping Legacy Stack #18
-
-#### Repository State
-An undocumented repository containing service module #18 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 18
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module18Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 19: Bootstrapping Legacy Stack #19
-
-#### Repository State
-An undocumented repository containing service module #19 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 19
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module19Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-
-### Case Study 20: Bootstrapping Legacy Stack #20
-
-#### Repository State
-An undocumented repository containing service module #20 was opened by an agent. No README or documentation existed.
-
-#### Step 1: Toolchain Identification
-```bash
-find . -maxdepth 2 -name "Package.swift" -o -name "package.json" -o -name "pyproject.toml"
-```
-
-#### Step 2: Extracting Build Invariants
-The agent analyzed the manifest and identified dependencies, compilation flags, and test targets.
-
-#### Step 3: Scaffolding AGENTS.md
-The agent wrote `AGENTS.md` with verified execution commands:
-```markdown
-# AGENTS.md for Module 20
-## Build & Run
-`swift build -c release`
-## Fast Test
-`swift test --filter Module20Tests`
-```
-
-#### Verification
-Subsequent agent invocations immediately leveraged `AGENTS.md` without running probing discovery steps.
-
-## 5. Appendix: Scaffolding Templates & Heuristics
-
-- **Bootstrap Standard 001**: Architectural documentation invariant #1. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 002**: Architectural documentation invariant #2. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 003**: Architectural documentation invariant #3. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 004**: Architectural documentation invariant #4. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 005**: Architectural documentation invariant #5. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 006**: Architectural documentation invariant #6. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 007**: Architectural documentation invariant #7. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 008**: Architectural documentation invariant #8. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 009**: Architectural documentation invariant #9. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 010**: Architectural documentation invariant #10. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 011**: Architectural documentation invariant #11. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 012**: Architectural documentation invariant #12. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 013**: Architectural documentation invariant #13. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 014**: Architectural documentation invariant #14. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 015**: Architectural documentation invariant #15. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 016**: Architectural documentation invariant #16. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 017**: Architectural documentation invariant #17. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 018**: Architectural documentation invariant #18. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 019**: Architectural documentation invariant #19. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 020**: Architectural documentation invariant #20. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 021**: Architectural documentation invariant #21. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 022**: Architectural documentation invariant #22. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 023**: Architectural documentation invariant #23. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 024**: Architectural documentation invariant #24. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 025**: Architectural documentation invariant #25. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 026**: Architectural documentation invariant #26. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 027**: Architectural documentation invariant #27. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 028**: Architectural documentation invariant #28. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 029**: Architectural documentation invariant #29. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 030**: Architectural documentation invariant #30. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 031**: Architectural documentation invariant #31. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 032**: Architectural documentation invariant #32. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 033**: Architectural documentation invariant #33. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 034**: Architectural documentation invariant #34. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 035**: Architectural documentation invariant #35. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 036**: Architectural documentation invariant #36. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 037**: Architectural documentation invariant #37. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 038**: Architectural documentation invariant #38. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 039**: Architectural documentation invariant #39. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 040**: Architectural documentation invariant #40. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 041**: Architectural documentation invariant #41. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 042**: Architectural documentation invariant #42. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 043**: Architectural documentation invariant #43. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 044**: Architectural documentation invariant #44. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 045**: Architectural documentation invariant #45. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 046**: Architectural documentation invariant #46. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 047**: Architectural documentation invariant #47. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 048**: Architectural documentation invariant #48. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 049**: Architectural documentation invariant #49. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 050**: Architectural documentation invariant #50. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 051**: Architectural documentation invariant #51. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 052**: Architectural documentation invariant #52. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 053**: Architectural documentation invariant #53. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 054**: Architectural documentation invariant #54. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 055**: Architectural documentation invariant #55. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 056**: Architectural documentation invariant #56. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 057**: Architectural documentation invariant #57. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 058**: Architectural documentation invariant #58. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 059**: Architectural documentation invariant #59. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 060**: Architectural documentation invariant #60. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 061**: Architectural documentation invariant #61. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 062**: Architectural documentation invariant #62. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 063**: Architectural documentation invariant #63. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 064**: Architectural documentation invariant #64. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 065**: Architectural documentation invariant #65. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 066**: Architectural documentation invariant #66. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 067**: Architectural documentation invariant #67. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 068**: Architectural documentation invariant #68. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 069**: Architectural documentation invariant #69. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 070**: Architectural documentation invariant #70. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 071**: Architectural documentation invariant #71. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 072**: Architectural documentation invariant #72. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 073**: Architectural documentation invariant #73. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 074**: Architectural documentation invariant #74. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 075**: Architectural documentation invariant #75. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 076**: Architectural documentation invariant #76. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 077**: Architectural documentation invariant #77. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 078**: Architectural documentation invariant #78. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 079**: Architectural documentation invariant #79. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 080**: Architectural documentation invariant #80. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 081**: Architectural documentation invariant #81. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 082**: Architectural documentation invariant #82. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 083**: Architectural documentation invariant #83. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 084**: Architectural documentation invariant #84. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 085**: Architectural documentation invariant #85. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 086**: Architectural documentation invariant #86. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 087**: Architectural documentation invariant #87. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 088**: Architectural documentation invariant #88. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 089**: Architectural documentation invariant #89. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 090**: Architectural documentation invariant #90. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 091**: Architectural documentation invariant #91. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 092**: Architectural documentation invariant #92. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 093**: Architectural documentation invariant #93. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 094**: Architectural documentation invariant #94. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 095**: Architectural documentation invariant #95. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 096**: Architectural documentation invariant #96. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 097**: Architectural documentation invariant #97. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 098**: Architectural documentation invariant #98. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 099**: Architectural documentation invariant #99. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 100**: Architectural documentation invariant #100. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 101**: Architectural documentation invariant #101. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 102**: Architectural documentation invariant #102. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 103**: Architectural documentation invariant #103. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 104**: Architectural documentation invariant #104. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 105**: Architectural documentation invariant #105. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 106**: Architectural documentation invariant #106. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 107**: Architectural documentation invariant #107. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 108**: Architectural documentation invariant #108. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 109**: Architectural documentation invariant #109. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 110**: Architectural documentation invariant #110. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 111**: Architectural documentation invariant #111. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 112**: Architectural documentation invariant #112. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 113**: Architectural documentation invariant #113. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 114**: Architectural documentation invariant #114. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 115**: Architectural documentation invariant #115. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 116**: Architectural documentation invariant #116. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 117**: Architectural documentation invariant #117. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 118**: Architectural documentation invariant #118. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 119**: Architectural documentation invariant #119. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 120**: Architectural documentation invariant #120. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 121**: Architectural documentation invariant #121. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 122**: Architectural documentation invariant #122. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 123**: Architectural documentation invariant #123. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 124**: Architectural documentation invariant #124. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 125**: Architectural documentation invariant #125. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 126**: Architectural documentation invariant #126. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 127**: Architectural documentation invariant #127. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 128**: Architectural documentation invariant #128. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 129**: Architectural documentation invariant #129. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 130**: Architectural documentation invariant #130. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 131**: Architectural documentation invariant #131. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 132**: Architectural documentation invariant #132. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 133**: Architectural documentation invariant #133. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 134**: Architectural documentation invariant #134. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 135**: Architectural documentation invariant #135. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 136**: Architectural documentation invariant #136. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 137**: Architectural documentation invariant #137. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 138**: Architectural documentation invariant #138. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 139**: Architectural documentation invariant #139. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 140**: Architectural documentation invariant #140. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 141**: Architectural documentation invariant #141. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 142**: Architectural documentation invariant #142. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 143**: Architectural documentation invariant #143. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 144**: Architectural documentation invariant #144. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 145**: Architectural documentation invariant #145. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 146**: Architectural documentation invariant #146. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 147**: Architectural documentation invariant #147. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 148**: Architectural documentation invariant #148. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 149**: Architectural documentation invariant #149. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 150**: Architectural documentation invariant #150. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 151**: Architectural documentation invariant #151. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 152**: Architectural documentation invariant #152. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 153**: Architectural documentation invariant #153. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 154**: Architectural documentation invariant #154. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 155**: Architectural documentation invariant #155. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 156**: Architectural documentation invariant #156. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 157**: Architectural documentation invariant #157. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 158**: Architectural documentation invariant #158. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 159**: Architectural documentation invariant #159. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 160**: Architectural documentation invariant #160. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 161**: Architectural documentation invariant #161. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 162**: Architectural documentation invariant #162. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 163**: Architectural documentation invariant #163. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 164**: Architectural documentation invariant #164. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 165**: Architectural documentation invariant #165. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 166**: Architectural documentation invariant #166. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 167**: Architectural documentation invariant #167. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 168**: Architectural documentation invariant #168. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 169**: Architectural documentation invariant #169. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 170**: Architectural documentation invariant #170. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 171**: Architectural documentation invariant #171. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 172**: Architectural documentation invariant #172. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 173**: Architectural documentation invariant #173. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 174**: Architectural documentation invariant #174. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 175**: Architectural documentation invariant #175. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 176**: Architectural documentation invariant #176. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 177**: Architectural documentation invariant #177. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 178**: Architectural documentation invariant #178. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 179**: Architectural documentation invariant #179. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 180**: Architectural documentation invariant #180. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 181**: Architectural documentation invariant #181. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 182**: Architectural documentation invariant #182. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 183**: Architectural documentation invariant #183. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 184**: Architectural documentation invariant #184. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 185**: Architectural documentation invariant #185. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 186**: Architectural documentation invariant #186. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 187**: Architectural documentation invariant #187. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 188**: Architectural documentation invariant #188. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 189**: Architectural documentation invariant #189. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 190**: Architectural documentation invariant #190. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 191**: Architectural documentation invariant #191. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 192**: Architectural documentation invariant #192. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 193**: Architectural documentation invariant #193. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 194**: Architectural documentation invariant #194. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 195**: Architectural documentation invariant #195. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 196**: Architectural documentation invariant #196. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 197**: Architectural documentation invariant #197. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 198**: Architectural documentation invariant #198. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 199**: Architectural documentation invariant #199. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 200**: Architectural documentation invariant #200. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 201**: Architectural documentation invariant #201. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 202**: Architectural documentation invariant #202. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 203**: Architectural documentation invariant #203. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 204**: Architectural documentation invariant #204. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 205**: Architectural documentation invariant #205. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 206**: Architectural documentation invariant #206. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 207**: Architectural documentation invariant #207. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 208**: Architectural documentation invariant #208. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 209**: Architectural documentation invariant #209. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 210**: Architectural documentation invariant #210. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 211**: Architectural documentation invariant #211. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 212**: Architectural documentation invariant #212. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 213**: Architectural documentation invariant #213. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 214**: Architectural documentation invariant #214. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 215**: Architectural documentation invariant #215. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 216**: Architectural documentation invariant #216. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 217**: Architectural documentation invariant #217. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 218**: Architectural documentation invariant #218. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 219**: Architectural documentation invariant #219. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 220**: Architectural documentation invariant #220. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 221**: Architectural documentation invariant #221. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 222**: Architectural documentation invariant #222. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 223**: Architectural documentation invariant #223. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 224**: Architectural documentation invariant #224. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 225**: Architectural documentation invariant #225. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 226**: Architectural documentation invariant #226. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 227**: Architectural documentation invariant #227. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 228**: Architectural documentation invariant #228. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 229**: Architectural documentation invariant #229. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 230**: Architectural documentation invariant #230. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 231**: Architectural documentation invariant #231. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 232**: Architectural documentation invariant #232. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 233**: Architectural documentation invariant #233. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 234**: Architectural documentation invariant #234. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 235**: Architectural documentation invariant #235. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 236**: Architectural documentation invariant #236. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 237**: Architectural documentation invariant #237. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 238**: Architectural documentation invariant #238. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 239**: Architectural documentation invariant #239. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 240**: Architectural documentation invariant #240. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 241**: Architectural documentation invariant #241. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 242**: Architectural documentation invariant #242. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 243**: Architectural documentation invariant #243. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 244**: Architectural documentation invariant #244. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 245**: Architectural documentation invariant #245. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 246**: Architectural documentation invariant #246. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 247**: Architectural documentation invariant #247. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 248**: Architectural documentation invariant #248. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Standard 249**: Architectural documentation invariant #249. Guarantees immediate agent onboarding across any tech stack.
-- **Bootstrap Rule 001**: Advanced documentation mapping rule #1.
-- **Bootstrap Rule 002**: Advanced documentation mapping rule #2.
-- **Bootstrap Rule 003**: Advanced documentation mapping rule #3.
-- **Bootstrap Rule 004**: Advanced documentation mapping rule #4.
-- **Bootstrap Rule 005**: Advanced documentation mapping rule #5.
-- **Bootstrap Rule 006**: Advanced documentation mapping rule #6.
-- **Bootstrap Rule 007**: Advanced documentation mapping rule #7.
-- **Bootstrap Rule 008**: Advanced documentation mapping rule #8.
-- **Bootstrap Rule 009**: Advanced documentation mapping rule #9.
-- **Bootstrap Rule 010**: Advanced documentation mapping rule #10.
-- **Bootstrap Rule 011**: Advanced documentation mapping rule #11.
-- **Bootstrap Rule 012**: Advanced documentation mapping rule #12.
-- **Bootstrap Rule 013**: Advanced documentation mapping rule #13.
-- **Bootstrap Rule 014**: Advanced documentation mapping rule #14.
-- **Bootstrap Rule 015**: Advanced documentation mapping rule #15.
-- **Bootstrap Rule 016**: Advanced documentation mapping rule #16.
-- **Bootstrap Rule 017**: Advanced documentation mapping rule #17.
-- **Bootstrap Rule 018**: Advanced documentation mapping rule #18.
-- **Bootstrap Rule 019**: Advanced documentation mapping rule #19.
-- **Bootstrap Rule 020**: Advanced documentation mapping rule #20.
-- **Bootstrap Rule 021**: Advanced documentation mapping rule #21.
-- **Bootstrap Rule 022**: Advanced documentation mapping rule #22.
-- **Bootstrap Rule 023**: Advanced documentation mapping rule #23.
-- **Bootstrap Rule 024**: Advanced documentation mapping rule #24.
-- **Bootstrap Rule 025**: Advanced documentation mapping rule #25.
-- **Bootstrap Rule 026**: Advanced documentation mapping rule #26.
-- **Bootstrap Rule 027**: Advanced documentation mapping rule #27.
-- **Bootstrap Rule 028**: Advanced documentation mapping rule #28.
-- **Bootstrap Rule 029**: Advanced documentation mapping rule #29.
-- **Bootstrap Rule 030**: Advanced documentation mapping rule #30.
-- **Bootstrap Rule 031**: Advanced documentation mapping rule #31.
-- **Bootstrap Rule 032**: Advanced documentation mapping rule #32.
-- **Bootstrap Rule 033**: Advanced documentation mapping rule #33.
-- **Bootstrap Rule 034**: Advanced documentation mapping rule #34.
-- **Bootstrap Rule 035**: Advanced documentation mapping rule #35.
-- **Bootstrap Rule 036**: Advanced documentation mapping rule #36.
-- **Bootstrap Rule 037**: Advanced documentation mapping rule #37.
-- **Bootstrap Rule 038**: Advanced documentation mapping rule #38.
-- **Bootstrap Rule 039**: Advanced documentation mapping rule #39.
-- **Bootstrap Rule 040**: Advanced documentation mapping rule #40.
-- **Bootstrap Rule 041**: Advanced documentation mapping rule #41.
-- **Bootstrap Rule 042**: Advanced documentation mapping rule #42.
-- **Bootstrap Rule 043**: Advanced documentation mapping rule #43.
-- **Bootstrap Rule 044**: Advanced documentation mapping rule #44.
-- **Bootstrap Rule 045**: Advanced documentation mapping rule #45.
-- **Bootstrap Rule 046**: Advanced documentation mapping rule #46.
-- **Bootstrap Rule 047**: Advanced documentation mapping rule #47.
-- **Bootstrap Rule 048**: Advanced documentation mapping rule #48.
-- **Bootstrap Rule 049**: Advanced documentation mapping rule #49.
-- **Bootstrap Rule 050**: Advanced documentation mapping rule #50.
-- **Bootstrap Rule 051**: Advanced documentation mapping rule #51.
-- **Bootstrap Rule 052**: Advanced documentation mapping rule #52.
-- **Bootstrap Rule 053**: Advanced documentation mapping rule #53.
-- **Bootstrap Rule 054**: Advanced documentation mapping rule #54.
-- **Bootstrap Rule 055**: Advanced documentation mapping rule #55.
-- **Bootstrap Rule 056**: Advanced documentation mapping rule #56.
-- **Bootstrap Rule 057**: Advanced documentation mapping rule #57.
-- **Bootstrap Rule 058**: Advanced documentation mapping rule #58.
-- **Bootstrap Rule 059**: Advanced documentation mapping rule #59.
-- **Bootstrap Rule 060**: Advanced documentation mapping rule #60.
-- **Bootstrap Rule 061**: Advanced documentation mapping rule #61.
-- **Bootstrap Rule 062**: Advanced documentation mapping rule #62.
-- **Bootstrap Rule 063**: Advanced documentation mapping rule #63.
-- **Bootstrap Rule 064**: Advanced documentation mapping rule #64.
-- **Bootstrap Rule 065**: Advanced documentation mapping rule #65.
-- **Bootstrap Rule 066**: Advanced documentation mapping rule #66.
-- **Bootstrap Rule 067**: Advanced documentation mapping rule #67.
-- **Bootstrap Rule 068**: Advanced documentation mapping rule #68.
-- **Bootstrap Rule 069**: Advanced documentation mapping rule #69.
-- **Bootstrap Rule 070**: Advanced documentation mapping rule #70.
-- **Bootstrap Rule 071**: Advanced documentation mapping rule #71.
-- **Bootstrap Rule 072**: Advanced documentation mapping rule #72.
-- **Bootstrap Rule 073**: Advanced documentation mapping rule #73.
-- **Bootstrap Rule 074**: Advanced documentation mapping rule #74.
-- **Bootstrap Rule 075**: Advanced documentation mapping rule #75.
-- **Bootstrap Rule 076**: Advanced documentation mapping rule #76.
-- **Bootstrap Rule 077**: Advanced documentation mapping rule #77.
-- **Bootstrap Rule 078**: Advanced documentation mapping rule #78.
-- **Bootstrap Rule 079**: Advanced documentation mapping rule #79.
-- **Bootstrap Rule 080**: Advanced documentation mapping rule #80.
-- **Bootstrap Rule 081**: Advanced documentation mapping rule #81.
-- **Bootstrap Rule 082**: Advanced documentation mapping rule #82.
-- **Bootstrap Rule 083**: Advanced documentation mapping rule #83.
-- **Bootstrap Rule 084**: Advanced documentation mapping rule #84.
-- **Bootstrap Rule 085**: Advanced documentation mapping rule #85.
-- **Bootstrap Rule 086**: Advanced documentation mapping rule #86.
-- **Bootstrap Rule 087**: Advanced documentation mapping rule #87.
-- **Bootstrap Rule 088**: Advanced documentation mapping rule #88.
-- **Bootstrap Rule 089**: Advanced documentation mapping rule #89.
-- **Bootstrap Rule 090**: Advanced documentation mapping rule #90.
-- **Bootstrap Rule 091**: Advanced documentation mapping rule #91.
-- **Bootstrap Rule 092**: Advanced documentation mapping rule #92.
-- **Bootstrap Rule 093**: Advanced documentation mapping rule #93.
-- **Bootstrap Rule 094**: Advanced documentation mapping rule #94.
-- **Bootstrap Rule 095**: Advanced documentation mapping rule #95.
-- **Bootstrap Rule 096**: Advanced documentation mapping rule #96.
-- **Bootstrap Rule 097**: Advanced documentation mapping rule #97.
-- **Bootstrap Rule 098**: Advanced documentation mapping rule #98.
-- **Bootstrap Rule 099**: Advanced documentation mapping rule #99.
-- **Bootstrap Rule 100**: Advanced documentation mapping rule #100.
-- **Bootstrap Rule 101**: Advanced documentation mapping rule #101.
-- **Bootstrap Rule 102**: Advanced documentation mapping rule #102.
-- **Bootstrap Rule 103**: Advanced documentation mapping rule #103.
-- **Bootstrap Rule 104**: Advanced documentation mapping rule #104.
-- **Bootstrap Rule 105**: Advanced documentation mapping rule #105.
-- **Bootstrap Rule 106**: Advanced documentation mapping rule #106.
-- **Bootstrap Rule 107**: Advanced documentation mapping rule #107.
-- **Bootstrap Rule 108**: Advanced documentation mapping rule #108.
-- **Bootstrap Rule 109**: Advanced documentation mapping rule #109.
-- **Bootstrap Rule 110**: Advanced documentation mapping rule #110.
-- **Bootstrap Rule 111**: Advanced documentation mapping rule #111.
-- **Bootstrap Rule 112**: Advanced documentation mapping rule #112.
-- **Bootstrap Rule 113**: Advanced documentation mapping rule #113.
-- **Bootstrap Rule 114**: Advanced documentation mapping rule #114.
-- **Bootstrap Rule 115**: Advanced documentation mapping rule #115.
-- **Bootstrap Rule 116**: Advanced documentation mapping rule #116.
-- **Bootstrap Rule 117**: Advanced documentation mapping rule #117.
-- **Bootstrap Rule 118**: Advanced documentation mapping rule #118.
-- **Bootstrap Rule 119**: Advanced documentation mapping rule #119.
-- **Bootstrap Rule 120**: Advanced documentation mapping rule #120.
-- **Bootstrap Rule 121**: Advanced documentation mapping rule #121.
-- **Bootstrap Rule 122**: Advanced documentation mapping rule #122.
-- **Bootstrap Rule 123**: Advanced documentation mapping rule #123.
-- **Bootstrap Rule 124**: Advanced documentation mapping rule #124.
-- **Bootstrap Rule 125**: Advanced documentation mapping rule #125.
-- **Bootstrap Rule 126**: Advanced documentation mapping rule #126.
-- **Bootstrap Rule 127**: Advanced documentation mapping rule #127.
-- **Bootstrap Rule 128**: Advanced documentation mapping rule #128.
-- **Bootstrap Rule 129**: Advanced documentation mapping rule #129.
-- **Bootstrap Rule 130**: Advanced documentation mapping rule #130.
-- **Bootstrap Rule 131**: Advanced documentation mapping rule #131.
-- **Bootstrap Rule 132**: Advanced documentation mapping rule #132.
-- **Bootstrap Rule 133**: Advanced documentation mapping rule #133.
-- **Bootstrap Rule 134**: Advanced documentation mapping rule #134.
-- **Bootstrap Rule 135**: Advanced documentation mapping rule #135.
-- **Bootstrap Rule 136**: Advanced documentation mapping rule #136.
-- **Bootstrap Rule 137**: Advanced documentation mapping rule #137.
-- **Bootstrap Rule 138**: Advanced documentation mapping rule #138.
-- **Bootstrap Rule 139**: Advanced documentation mapping rule #139.
-- **Bootstrap Rule 140**: Advanced documentation mapping rule #140.
-- **Bootstrap Rule 141**: Advanced documentation mapping rule #141.
-- **Bootstrap Rule 142**: Advanced documentation mapping rule #142.
-- **Bootstrap Rule 143**: Advanced documentation mapping rule #143.
-- **Bootstrap Rule 144**: Advanced documentation mapping rule #144.
-- **Bootstrap Rule 145**: Advanced documentation mapping rule #145.
-- **Bootstrap Rule 146**: Advanced documentation mapping rule #146.
-- **Bootstrap Rule 147**: Advanced documentation mapping rule #147.
-- **Bootstrap Rule 148**: Advanced documentation mapping rule #148.
-- **Bootstrap Rule 149**: Advanced documentation mapping rule #149.
-- **Bootstrap Rule 150**: Advanced documentation mapping rule #150.
-- **Bootstrap Rule 151**: Advanced documentation mapping rule #151.
-- **Bootstrap Rule 152**: Advanced documentation mapping rule #152.
-- **Bootstrap Rule 153**: Advanced documentation mapping rule #153.
-- **Bootstrap Rule 154**: Advanced documentation mapping rule #154.
-- **Bootstrap Rule 155**: Advanced documentation mapping rule #155.
-- **Bootstrap Rule 156**: Advanced documentation mapping rule #156.
-- **Bootstrap Rule 157**: Advanced documentation mapping rule #157.
-- **Bootstrap Rule 158**: Advanced documentation mapping rule #158.
+---
+
+## 5. Real-World Stack Scaffolding Case Studies
+
+### Case Study 1: Swift Package Manager Library (SPM)
+- **Detected Manifest**: `Package.swift`
+- **Agent Actions**:
+  1. Parse targets in `Package.swift` to identify library name (`Sources/MyLib`) and test target (`Tests/MyLibTests`).
+  2. Test execution: verify `swift test` runs cleanly.
+  3. Generate `AGENTS.md` with:
+     ```bash
+     swift build
+     swift test -v
+     ```
+  4. Generate `ARCHITECTURE.md` showing `Sources/` and `Tests/` mapping.
+
+### Case Study 2: Next.js + Tailwind + TypeScript Web Application
+- **Detected Manifest**: `package.json` containing `"next"`, `"tailwindcss"`, `"typescript"`
+- **Agent Actions**:
+  1. Inspect `package.json` scripts: `"dev"`, `"build"`, `"lint"`.
+  2. Verify if `pnpm-lock.yaml`, `yarn.lock`, or `package-lock.json` exists to select correct package manager.
+  3. Generate `AGENTS.md` with:
+     ```bash
+     npm run build
+     npm run lint
+     npm test
+     ```
+  4. Scaffold `DESIGN_SYSTEM.md` by inspecting `tailwind.config.js`.
+
+### Case Study 3: Python / FastAPI Backend Microservice
+- **Detected Manifest**: `pyproject.toml` or `requirements.txt` containing `"fastapi"`, `"uvicorn"`
+- **Agent Actions**:
+  1. Identify test runner: inspect for `pytest` in dependencies.
+  2. Identify linter: inspect for `ruff` or `flake8`.
+  3. Generate `AGENTS.md` with:
+     ```bash
+     pytest tests/ -v
+     ruff check .
+     uvicorn main:app --reload
+     ```
+  4. Generate `SECURITY.md` documenting `.env.example` usage for database connection strings.
+
+### Case Study 4: Multi-Container Docker Compose Stack
+- **Detected Manifest**: `docker-compose.yml`
+- **Agent Actions**:
+  1. Parse `services:` block to identify database (Postgres/Redis), API, and frontend containers.
+  2. Verify healthcheck declarations.
+  3. Generate `AGENTS.md` with:
+     ```bash
+     docker compose up -d
+     docker compose ps
+     docker compose logs -f api
+     ```
+  4. Scaffold `ARCHITECTURE.md` with a Mermaid container topology diagram.
+
+---
+
+## 6. Monorepo Bootstrapping Protocol
+
+When a repository contains multiple sub-projects (e.g. `apps/ios/`, `apps/web/`, `packages/shared/`):
+
+1. **Root `AGENTS.md`**:
+   - Provide high-level navigation mapping to child projects.
+   - List workspace-wide orchestration commands (e.g. `pnpm run build --filter ...`).
+2. **Per-Package `AGENTS.md`**:
+   - Place localized `AGENTS.md` in each package directory containing exact, package-specific build and test commands.
+3. **Monorepo `ARCHITECTURE.md`**:
+   - Explicitly define inter-package dependency relationships (e.g. `apps/web` depends on `packages/shared`, but never vice-versa).
+
+---
+
+## 7. Operational Verification Checklist
+
+Before considering a codebase bootstrapping task complete:
+
+- [ ] Every generated `AGENTS.md` contains executable build and test commands verified in the local terminal.
+- [ ] `ARCHITECTURE.md` accurately reflects the real directory tree and component boundaries.
+- [ ] `SECURITY.md` exists and `.env.example` has been created if the project uses environment variables.
+- [ ] No generated documentation contains duplicate filler, placeholder loops, or synthetic padding.
+- [ ] All 7 pillars are formatted in standard, readable GitHub-flavored markdown.
