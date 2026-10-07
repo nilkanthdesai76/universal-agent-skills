@@ -381,529 +381,142 @@ jobs:
 
 ## 7. Deep-Dive: Diagnostic Case Studies
 
-### Case Study 01: Headless Pipeline Triage Scenario
+### Case Study 01: Exit Code 65 Code Signing Bypass for Pull Requests
 
 #### Scenario Overview
-A developer pushed a feature update for Apple sub-module #1 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
+A pull request workflow fails on a headless `macos-14` runner with exit code 65 because the target Xcode project has automatic signing enabled with an internal development team ID that is unavailable on public or ephemeral CI runners.
 
 #### The Error Log
 ```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module1.swift
-error: Signing for "MyApp_Submodule1" requires a development team.
+CompileSwift normal arm64 /Users/runner/work/app/Sources/CoreModule.swift
+error: Signing for "CoreModule" requires a development team.
 Select a development team in the Signing & Capabilities editor.
 ** BUILD FAILED ** [Exit Code 65]
 ```
 
 #### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
+1. **Local vs CI Divergence**: Local developer machines have personal Apple Developer certificates installed in their login keychains, so Xcode signs automatically.
+2. **Headless Environment**: CI virtual machines lack signing identities.
+3. **Resolution Strategy**: Unit tests and PR evaluation do not need code signing signatures; disable code signing checks completely for non-release builds.
 
-#### Automated Doctor Resolution
-Apply the headless signing override:
+#### Automated Resolution
 ```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module1 \
+xcodebuild clean test \
+  -project App.xcodeproj \
+  -scheme CoreModule \
   -destination 'platform=macOS' \
+  -derivedDataPath build/DerivedData \
   CODE_SIGNING_ALLOWED=NO \
   CODE_SIGN_IDENTITY="" \
   CODE_SIGNING_REQUIRED=NO
 ```
 
 #### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
+- Build succeeds with exit code 0.
+- No keychain unlock dialogs block execution.
 
+---
 
-### Case Study 02: Headless Pipeline Triage Scenario
+### Case Study 02: Simulator Destination Mismatch & CoreSimulator Daemon Triage
 
 #### Scenario Overview
-A developer pushed a feature update for Apple sub-module #2 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
+A test job fails immediately with exit code 70 because the requested simulator name or iOS version in `-destination` is not installed or the CoreSimulator service failed to respond.
 
 #### The Error Log
 ```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module2.swift
-error: Signing for "MyApp_Submodule2" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
+xcodebuild: error: Unable to find a destination matching the provided destination specifier:
+    { platform:iOS Simulator, OS:18.0, name:iPhone 16 Pro }
+Available destinations for the "App" scheme:
+    { platform:macOS, arch:arm64 }
 ```
 
 #### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
+1. **Image Runtime Variance**: GitHub Actions runner images periodically update their pre-installed Xcode and simulator runtimes. Specifying exact minor OS versions or uncommon device names causes lookup failures.
+2. **Dynamic Querying**: The workflow should dynamically inspect installed runtimes instead of hardcoding assumptions.
 
-#### Automated Doctor Resolution
-Apply the headless signing override:
+#### Automated Resolution
 ```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module2 \
-  -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
+# Query available simulators dynamically and extract UDID
+TARGET_UDID=$(xcrun simctl list devices available | grep -E "iPhone (15|16)" | grep -v "unavailable" | head -n 1 | grep -o -E '[0-9A-F-]{36}')
+
+if [ -z "$TARGET_UDID" ]; then
+  echo "⚠️ No existing device found, creating iPhone 16..."
+  TARGET_UDID=$(xcrun simctl create "CI-iPhone16" "com.apple.CoreSimulator.SimDeviceType.iPhone-16")
+fi
+
+echo "🚀 Booting simulator UDID: $TARGET_UDID"
+xcrun simctl boot "$TARGET_UDID" || true
+
+# Execute tests using explicit UDID destination
+xcodebuild test \
+  -scheme App \
+  -destination "platform=iOS Simulator,id=$TARGET_UDID"
 ```
 
 #### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
+- Tests execute reliably regardless of the runner's exact minor iOS version.
 
+---
 
-### Case Study 03: Headless Pipeline Triage Scenario
+### Case Study 03: SPM Command Plugin User Authorization Block
 
 #### Scenario Overview
-A developer pushed a feature update for Apple sub-module #3 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
+A project integrating SwiftLint or Sourcery as an SPM build tool plugin hangs indefinitely or terminates with an authorization error on headless runners.
 
 #### The Error Log
 ```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module3.swift
-error: Signing for "MyApp_Submodule3" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
+error: Package plugin 'SwiftLintPlugin' requires user authorization to run commands.
+Pass --allow-writing-to-package-directory or --skipPackagePluginValidation to approve.
 ```
 
 #### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
+Xcode 15+ introduced a security sandbox prompt requiring interactive user confirmation before running third-party Swift Package Manager plugins. In headless CI, this interactive prompt cannot be answered.
 
-#### Automated Doctor Resolution
-Apply the headless signing override:
+#### Automated Resolution
+Pass `-skipPackagePluginValidation` in the `xcodebuild` invocation:
 ```bash
 xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module3 \
+  -scheme App \
   -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
+  -skipPackagePluginValidation
 ```
 
-#### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
+---
 
-
-### Case Study 04: Headless Pipeline Triage Scenario
+### Case Study 04: Metal & Neural Engine Hardware Skip on Hypervisors
 
 #### Scenario Overview
-A developer pushed a feature update for Apple sub-module #4 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
+Unit tests running on cloud macOS virtual machines crash when attempting to compile Metal GPU shaders or instantiate Apple Neural Engine CoreML models.
 
 #### The Error Log
 ```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module4.swift
-error: Signing for "MyApp_Submodule4" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
+Fatal error: Failed to create MTLDevice: No Metal-capable GPU found in virtual machine hypervisor context.
+Test Case 'ShaderTests.testFragmentShader()' failed (0.012 seconds).
 ```
 
 #### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
+Cloud virtualized Mac runners frequently use software rendering without hardware GPU virtualization passthrough. Hardware-dependent tests must gracefully skip on CI.
 
-#### Automated Doctor Resolution
-Apply the headless signing override:
-```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module4 \
-  -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
+#### Automated Resolution
+Use `try XCTSkipIf()` in test suites:
+```swift
+import XCTest
+import Metal
+
+final class MetalShaderTests: XCTestCase {
+    func testFragmentShader() throws {
+        let isCI = ProcessInfo.processInfo.environment["CI"] != nil
+        guard let device = MTLCreateSystemDefaultDevice() else {
+            try XCTSkipIf(isCI, "Metal hardware device unavailable on cloud CI hypervisor; skipping test.")
+            XCTFail("Metal device must be available on physical test hardware.")
+            return
+        }
+        
+        let commandQueue = device.makeCommandQueue()
+        XCTAssertNotNil(commandQueue)
+    }
+}
 ```
-
-#### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
-
-
-### Case Study 05: Headless Pipeline Triage Scenario
-
-#### Scenario Overview
-A developer pushed a feature update for Apple sub-module #5 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
-
-#### The Error Log
-```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module5.swift
-error: Signing for "MyApp_Submodule5" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
-```
-
-#### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
-
-#### Automated Doctor Resolution
-Apply the headless signing override:
-```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module5 \
-  -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
-```
-
-#### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
-
-
-### Case Study 06: Headless Pipeline Triage Scenario
-
-#### Scenario Overview
-A developer pushed a feature update for Apple sub-module #6 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
-
-#### The Error Log
-```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module6.swift
-error: Signing for "MyApp_Submodule6" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
-```
-
-#### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
-
-#### Automated Doctor Resolution
-Apply the headless signing override:
-```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module6 \
-  -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
-```
-
-#### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
-
-
-### Case Study 07: Headless Pipeline Triage Scenario
-
-#### Scenario Overview
-A developer pushed a feature update for Apple sub-module #7 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
-
-#### The Error Log
-```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module7.swift
-error: Signing for "MyApp_Submodule7" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
-```
-
-#### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
-
-#### Automated Doctor Resolution
-Apply the headless signing override:
-```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module7 \
-  -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
-```
-
-#### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
-
-
-### Case Study 08: Headless Pipeline Triage Scenario
-
-#### Scenario Overview
-A developer pushed a feature update for Apple sub-module #8 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
-
-#### The Error Log
-```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module8.swift
-error: Signing for "MyApp_Submodule8" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
-```
-
-#### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
-
-#### Automated Doctor Resolution
-Apply the headless signing override:
-```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module8 \
-  -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
-```
-
-#### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
-
-
-### Case Study 09: Headless Pipeline Triage Scenario
-
-#### Scenario Overview
-A developer pushed a feature update for Apple sub-module #9 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
-
-#### The Error Log
-```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module9.swift
-error: Signing for "MyApp_Submodule9" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
-```
-
-#### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
-
-#### Automated Doctor Resolution
-Apply the headless signing override:
-```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module9 \
-  -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
-```
-
-#### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
-
-
-### Case Study 10: Headless Pipeline Triage Scenario
-
-#### Scenario Overview
-A developer pushed a feature update for Apple sub-module #10 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
-
-#### The Error Log
-```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module10.swift
-error: Signing for "MyApp_Submodule10" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
-```
-
-#### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
-
-#### Automated Doctor Resolution
-Apply the headless signing override:
-```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module10 \
-  -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
-```
-
-#### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
-
-
-### Case Study 11: Headless Pipeline Triage Scenario
-
-#### Scenario Overview
-A developer pushed a feature update for Apple sub-module #11 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
-
-#### The Error Log
-```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module11.swift
-error: Signing for "MyApp_Submodule11" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
-```
-
-#### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
-
-#### Automated Doctor Resolution
-Apply the headless signing override:
-```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module11 \
-  -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
-```
-
-#### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
-
-
-### Case Study 12: Headless Pipeline Triage Scenario
-
-#### Scenario Overview
-A developer pushed a feature update for Apple sub-module #12 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
-
-#### The Error Log
-```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module12.swift
-error: Signing for "MyApp_Submodule12" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
-```
-
-#### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
-
-#### Automated Doctor Resolution
-Apply the headless signing override:
-```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module12 \
-  -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
-```
-
-#### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
-
-
-### Case Study 13: Headless Pipeline Triage Scenario
-
-#### Scenario Overview
-A developer pushed a feature update for Apple sub-module #13 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
-
-#### The Error Log
-```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module13.swift
-error: Signing for "MyApp_Submodule13" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
-```
-
-#### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
-
-#### Automated Doctor Resolution
-Apply the headless signing override:
-```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module13 \
-  -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
-```
-
-#### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
-
-
-### Case Study 14: Headless Pipeline Triage Scenario
-
-#### Scenario Overview
-A developer pushed a feature update for Apple sub-module #14 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
-
-#### The Error Log
-```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module14.swift
-error: Signing for "MyApp_Submodule14" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
-```
-
-#### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
-
-#### Automated Doctor Resolution
-Apply the headless signing override:
-```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module14 \
-  -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
-```
-
-#### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
-
-
-### Case Study 15: Headless Pipeline Triage Scenario
-
-#### Scenario Overview
-A developer pushed a feature update for Apple sub-module #15 (e.g. background sync, image processing, or Keychain storage). The local build succeeded in Xcode GUI, but the GitHub Actions `macos-14` workflow terminated with an exit code 65.
-
-#### The Error Log
-```
-CompileSwift normal arm64 /Users/runner/work/app/Sources/Module15.swift
-error: Signing for "MyApp_Submodule15" requires a development team.
-Select a development team in the Signing & Capabilities editor.
-** BUILD FAILED ** [Exit Code 65]
-```
-
-#### Diagnostic Breakdown
-1. **Local vs CI Isolation**: The local engineer had a personal Apple Developer Certificate installed in their local login keychain. Xcode automatically applied automatic signing.
-2. **Headless Reality**: The CI runner is a clean virtual machine with no signing identities.
-3. **Target Analysis**: The target was being compiled with default `CODE_SIGNING_REQUIRED=YES`.
-
-#### Automated Doctor Resolution
-Apply the headless signing override:
-```bash
-xcodebuild build \
-  -project MyApp.xcodeproj \
-  -scheme Module15 \
-  -destination 'platform=macOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGN_IDENTITY="" \
-  CODE_SIGNING_REQUIRED=NO
-```
-
-#### Verification Check
-- Build succeeds in 12 seconds with zero code signing prompts.
-- Test suite executes cleanly without keychain unlock locks.
 
 ## 8. Headless xcodebuild CLI Flags Reference
 

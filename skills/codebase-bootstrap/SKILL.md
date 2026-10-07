@@ -87,7 +87,7 @@ project-root/
 
 ### Pillar 1: Production `AGENTS.md` Template
 
-```markdown
+````markdown
 # AGENTS.md
 
 Operational manual and ground-truth invariants for AI coding assistants working on this repository.
@@ -123,13 +123,13 @@ Before marking any task complete:
 1. Run the fast test command and verify 100% green pass.
 2. Verify `git status` has zero untracked artifacts or modified files outside scope.
 3. Check compiler output for zero warnings.
-```
+````
 
 ---
 
 ### Pillar 2: Production `ARCHITECTURE.md` Template
 
-```markdown
+````markdown
 # ARCHITECTURE.md
 
 Directory taxonomy, module boundaries, and data flow architecture.
@@ -160,13 +160,13 @@ flowchart TD
 - `Models/` must never import UI frameworks (`SwiftUI`, `UIKit`, `React`).
 - `Services/` must be decoupled from UI lifecycle and isolated to custom actors.
 - `UI/` must observe state through view models or observable stores; never instantiate raw network clients directly inside views.
-```
+````
 
 ---
 
 ### Pillar 3: Production `PRD.md` Template
 
-```markdown
+````markdown
 # PRD.md — Product Requirements Document
 
 ## 1. Problem Statement
@@ -186,13 +186,13 @@ Describe the core user problem this software solves.
 - **Performance**: Launch time < 400ms; memory footprint < 60MB.
 - **Privacy**: Zero analytics tracking; zero third-party telemetry.
 - **Reliability**: Graceful offline degradation; zero crash tolerance.
-```
+````
 
 ---
 
 ### Pillar 4: Production `TESTING.md` Template
 
-```markdown
+````markdown
 # TESTING.md
 
 Testing conventions, test suites, and mock patterns.
@@ -224,13 +224,13 @@ final class MockNetworkSession: NetworkSessionProtocol {
     }
 }
 ```
-```
+````
 
 ---
 
 ### Pillar 5: Production `CODE_STYLE.md` Template
 
-```markdown
+````markdown
 # CODE_STYLE.md
 
 Formatting standards, linters, naming conventions, and language idioms.
@@ -254,13 +254,13 @@ Formatting standards, linters, naming conventions, and language idioms.
 - Prefer value types (`struct`, `enum`) over reference types (`class`) unless identity or reference sharing is required.
 - Handle all errors explicitly with custom error enums conforming to `Error` and `LocalizedError`.
 - Never use force unwrap (`!`) in production code paths; use `guard let` or `if let`.
-```
+````
 
 ---
 
 ### Pillar 6: Production `SECURITY.md` Template
 
-```markdown
+````markdown
 # SECURITY.md
 
 Security policies, secret management, and vulnerability reporting.
@@ -278,13 +278,13 @@ git grep -nE "(ghp_[a-zA-Z0-9]{36}|sk-[a-zA-Z0-9]{32,}|AKIA[0-9A-Z]{16})" || ech
 
 ## 3. Vulnerability Reporting
 To report a security vulnerability, please email security@[domain] rather than opening a public issue.
-```
+````
 
 ---
 
 ### Pillar 7: Production `DESIGN_SYSTEM.md` Template
 
-```markdown
+````markdown
 # DESIGN_SYSTEM.md
 
 Visual design tokens, typography scales, colors, and layout geometry.
@@ -306,7 +306,7 @@ Visual design tokens, typography scales, colors, and layout geometry.
 - Minimum touch target: 44×44 pt (Apple HIG compliant)
 - Standard margins: 16pt (Mobile) / 24pt (Tablet / Desktop)
 - Standard corner radius: 12pt (Cards) / 8pt (Buttons) / 999pt (Pills)
-```
+````
 
 ---
 

@@ -944,40 +944,6 @@ public actor BoundedTaskProcessor<Item: Sendable, Output: Sendable> {
 
 ---
 
-## 11. Diagnostic Decision Tree for AI Agents
-
-```
-                        [Swift 6 Compilation Error Detected]
-                                         │
-                                         ▼
-                   Does error mention 'Sendable' or 'Actor isolation'?
-                          ├── YES ───────────────────┐
-                          │                          │
-                          ▼                          ▼
-               Is it about a Property?       Is it about a Closure?
-                  ├── YES ──┐                   ├── YES ──┐
-                  │         │                   │         │
-                  ▼         ▼                   ▼         ▼
-             MainActor?    Actor?            Captures?   Escaping?
-                 │          │                   │           │
-                 ▼          ▼                   ▼           ▼
-             Add await    Mark                Use [let]   Mark
-             MainActor.   nonisolated         capture     @Sendable
-             run { }      let                 list
-```
-
----
-
-## 12. Conclusion & Verification Summary
-
-By applying the formal invariants in this manual:
-1. **Zero Data Races**: Concurrency guarantees are verified at compile time.
-2. **Zero Runtime Deadlocks**: The cooperative pool remains unblocked.
-3. **Seamless CI**: Builds succeed cleanly under `macos-14`, `macos-15`, and Linux runners.
-4. **Predictable Architecture**: Code remains maintainable, isolated, and responsive under high user load.
-
----
-
 ### Case Study 11: Actor Isolation with SwiftUI Property Wrappers
 Understanding how `@State`, `@Binding`, and `@StateObject` interact with Swift 6 actors:
 
@@ -1110,3 +1076,38 @@ public actor InMemoryRepository<T: Identifiable & Sendable>: AsyncRepository whe
     }
 }
 ```
+
+---
+
+## 11. Diagnostic Decision Tree for AI Agents
+
+```
+                        [Swift 6 Compilation Error Detected]
+                                         │
+                                         ▼
+                   Does error mention 'Sendable' or 'Actor isolation'?
+                          ├── YES ───────────────────┐
+                          │                          │
+                          ▼                          ▼
+               Is it about a Property?       Is it about a Closure?
+                  ├── YES ──┐                   ├── YES ──┐
+                  │         │                   │         │
+                  ▼         ▼                   ▼         ▼
+             MainActor?    Actor?            Captures?   Escaping?
+                 │          │                   │           │
+                 ▼          ▼                   ▼           ▼
+             Add await    Mark                Use [let]   Mark
+             MainActor.   nonisolated         capture     @Sendable
+             run { }      let                 list
+```
+
+---
+
+## 12. Conclusion & Verification Summary
+
+By applying the formal invariants in this manual:
+1. **Zero Data Races**: Concurrency guarantees are verified at compile time.
+2. **Zero Runtime Deadlocks**: The cooperative pool remains unblocked.
+3. **Seamless CI**: Builds succeed cleanly under `macos-14`, `macos-15`, and Linux runners.
+4. **Predictable Architecture**: Code remains maintainable, isolated, and responsive under high user load.
+

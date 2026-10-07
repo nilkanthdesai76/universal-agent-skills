@@ -12,381 +12,26 @@ The definitive operational manual for AI coding agents tasked with auditing iOS,
 
 ## 1. Executive Summary & Core Philosophy
 
-Starting Spring 2024, Apple strictly enforces **Privacy Manifests (`PrivacyInfo.xcprivacy`)** for all third-party SDKs and applications calling Apple's designated **Required Reason APIs**. Submissions lacking proper justification are rejected immediately by App Store Connect.
+Apple strictly enforces **Privacy Manifests (`PrivacyInfo.xcprivacy`)** for all applications and third-party frameworks invoking designated **Required Reason APIs**. Ingest engines in App Store Connect automatically reject submissions that link against these APIs without declaring approved reason codes.
 
 1. **Failure Modes of AI Agents**:
-   - Submitting apps without a `PrivacyInfo.xcprivacy` file bundled in the target resources.
+   - Submitting apps without a `PrivacyInfo.xcprivacy` file bundled in target resources.
    - Calling APIs such as `UserDefaults`, file modification timestamps, system boot time, or disk space without declaring the approved Apple reason code.
-   - Requesting `ATTrackingManager` tracking authorization without declaring `NSPrivacyTracking = true` in the privacy manifest.
+   - Requesting `ATTrackingManager` tracking authorization without declaring `NSPrivacyTracking = true` and tracking domains in the privacy manifest.
    - Leaving test advertising IDs or non-sanitized staging URLs in production binaries.
 
 2. **The Auditor's Mandate**:
-   - **Zero Undecared Required Reason APIs**: Every use of `UserDefaults`, `stat`, `sysctl`, or `volumeAvailableCapacity` must have an exact Apple reason string declared in `PrivacyInfo.xcprivacy`.
-   - **Privacy Manifest Verification**: Confirm the `.xcprivacy` file is in the target's **Copy Bundle Resources** phase.
+   - **Zero Undeclared Required Reason APIs**: Every invocation of `UserDefaults`, `stat`, `sysctl`, or `volumeAvailableCapacity` must have an authorized reason code declared in `PrivacyInfo.xcprivacy`.
+   - **Target Membership Verification**: Confirm `PrivacyInfo.xcprivacy` is included in the target's **Copy Bundle Resources** build phase.
    - **Tracking Transparency Consistency**: If IDFA is requested, declare `NSUserTrackingUsageDescription` in `Info.plist` and list tracking domains in `PrivacyInfo.xcprivacy`.
 
 ---
 
-## 2. The 4 Apple Required Reason API Categories
-
-### Category 1: User Defaults (`NSPrivacyAccessedAPITypeUserDefaults`)
-- **APIs**: `UserDefaults.standard`, `NSUserDefaults`.
-- **Allowed Reasons**:
-  - `CA92.1`: Access to read and write app-specific information (standard app settings).
-  - `1C8F.1`: Access to user defaults to read and write information that is only accessible to the app itself.
-
-### Category 2: File Timestamp (`NSPrivacyAccessedAPITypeFileTimestamp`)
-- **APIs**: `fileModificationDate`, `stat`, `getattrlist`.
-- **Allowed Reasons**:
-  - `C617.1`: Inside app container to manage file modifications.
-  - `3B52.1`: User-selected file timestamp access.
-
-### Category 3: System Boot Time (`NSPrivacyAccessedAPITypeSystemBootTime`)
-- **APIs**: `systemUptime`, `sysctl(KERN_BOOTTIME)`.
-- **Allowed Reasons**:
-  - `35F9.1`: Measure time elapsed between events within the app.
-
-### Category 4: Disk Space (`NSPrivacyAccessedAPITypeDiskSpace`)
-- **APIs**: `volumeAvailableCapacityForImportantUsageKey`, `statvfs`.
-- **Allowed Reasons**:
-  - `E174.1`: Check disk space to verify if there is enough space to write files.
-  - `85F4.1`: Display disk space to the user.
-
----
-
-## 3. Production PrivacyInfo.xcprivacy Template
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>NSPrivacyTracking</key>
-    <false/>
-    <key>NSPrivacyTrackingDomains</key>
-    <array/>
-    <key>NSPrivacyCollectedDataTypes</key>
-    <array/>
-    <key>NSPrivacyAccessedAPITypes</key>
-    <array>
-        <!-- UserDefaults Reason -->
-        <dict>
-            <key>NSPrivacyAccessedAPIType</key>
-            <string>NSPrivacyAccessedAPITypeUserDefaults</string>
-            <key>NSPrivacyAccessedAPITypeReasons</key>
-            <array>
-                <string>CA92.1</string>
-            </array>
-        </dict>
-        <!-- File Timestamp Reason -->
-        <dict>
-            <key>NSPrivacyAccessedAPIType</key>
-            <string>NSPrivacyAccessedAPITypeFileTimestamp</string>
-            <key>NSPrivacyAccessedAPITypeReasons</key>
-            <array>
-                <string>C617.1</string>
-            </array>
-        </dict>
-        <!-- Disk Space Reason -->
-        <dict>
-            <key>NSPrivacyAccessedAPIType</key>
-            <string>NSPrivacyAccessedAPITypeDiskSpace</string>
-            <key>NSPrivacyAccessedAPITypeReasons</key>
-            <array>
-                <string>E174.1</string>
-            </array>
-        </dict>
-    </array>
-</dict>
-</plist>
-```
-
----
-
-## 4. Automated Shell Scanner Script for Codebases
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-echo "==> Scanning codebase for Apple Required Reason APIs..."
-
-echo "1. Checking for UserDefaults usage:"
-grep -rn "UserDefaults" Sources/ || echo "None found"
-
-echo "2. Checking for File Timestamp APIs:"
-grep -rnE "(fileModificationDate|stat\()" Sources/ || echo "None found"
-
-echo "3. Checking for System Boot Time APIs:"
-grep -rnE "(systemUptime|KERN_BOOTTIME)" Sources/ || echo "None found"
-
-echo "4. Checking for Disk Space APIs:"
-grep -rnE "(volumeAvailableCapacity|statvfs)" Sources/ || echo "None found"
-```
-
----
-
-## 5. Detailed Submission Case Studies & Remedies
-
-### Case Study 01: App Store Compliance Audit Scenario #1
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #1 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module1.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 02: App Store Compliance Audit Scenario #2
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #2 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module2.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 03: App Store Compliance Audit Scenario #3
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #3 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module3.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 04: App Store Compliance Audit Scenario #4
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #4 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module4.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 05: App Store Compliance Audit Scenario #5
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #5 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module5.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 06: App Store Compliance Audit Scenario #6
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #6 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module6.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 07: App Store Compliance Audit Scenario #7
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #7 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module7.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 08: App Store Compliance Audit Scenario #8
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #8 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module8.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 09: App Store Compliance Audit Scenario #9
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #9 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module9.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 10: App Store Compliance Audit Scenario #10
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #10 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module10.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 11: App Store Compliance Audit Scenario #11
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #11 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module11.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 12: App Store Compliance Audit Scenario #12
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #12 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module12.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 13: App Store Compliance Audit Scenario #13
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #13 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module13.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 14: App Store Compliance Audit Scenario #14
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #14 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module14.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-
-### Case Study 15: App Store Compliance Audit Scenario #15
-
-#### Scenario Background
-An enterprise iOS application integrating payment module #15 was rejected during App Store review with rejection notice `ITMS-91053: Missing API declaration in Privacy Manifest`.
-
-#### Problem Analysis
-1. Binary inspection revealed that `Module15.swift` invoked `UserDefaults.standard.integer(forKey:)`.
-2. The project root lacked a `PrivacyInfo.xcprivacy` file.
-3. Apple's automated ingest bot flagged the missing `NSPrivacyAccessedAPITypeUserDefaults` declaration.
-
-#### Doctor's Resolution
-1. Created `Sources/PrivacyInfo.xcprivacy`.
-2. Added `NSPrivacyAccessedAPITypeUserDefaults` with reason code `CA92.1`.
-3. Verified in Xcode project file that `PrivacyInfo.xcprivacy` is included in target resources.
-4. Resubmitted; approved within 2 hours.
-
-## 6. Official Apple Required Reason API Category & Reason Code Matrix
+## 2. Official Apple Required Reason API Category & Reason Code Matrix
 
 Apple mandates that if any binary (main app or dependency) links against APIs in the following categories, a corresponding `NSPrivacyAccessedAPITypes` entry must declare an approved reason code.
 
-### 6.1 Category: User Defaults (`NSPrivacyAccessedAPITypeUserDefaults`)
+### 2.1 Category: User Defaults (`NSPrivacyAccessedAPITypeUserDefaults`)
 
 Covered APIs: `UserDefaults`, `NSUserDefaults`, `CFPreferencesCopyAppValue`, `CFPreferencesSetAppValue`.
 
@@ -396,7 +41,7 @@ Covered APIs: `UserDefaults`, `NSUserDefaults`, `CFPreferencesCopyAppValue`, `CF
 | `1C8F.1` | Third-party SDK accessing key-value pairs solely to configure or persist SDK-internal state. | Reading host app preferences without authorization; cross-app fingerprinting. |
 | `C56D.1` | Accessing user defaults across an app group consisting of apps distributed by the same developer. | Sharing defaults across different vendor team IDs. |
 
-### 6.2 Category: File Timestamp (`NSPrivacyAccessedAPITypeFileTimestamp`)
+### 2.2 Category: File Timestamp (`NSPrivacyAccessedAPITypeFileTimestamp`)
 
 Covered APIs: `stat`, `statfs`, `fstat`, `fstatat`, `getattrlist`, `getattrlistat`, `getattrlistbulk`, `futimes`, `utimes`, `NSURLContentModificationDateKey`, `NSURLCreationDateKey`, `FileManager.attributesOfItem(atPath:)`.
 
@@ -407,7 +52,7 @@ Covered APIs: `stat`, `statfs`, `fstat`, `fstatat`, `getattrlist`, `getattrlista
 | `0A2A.1` | Third-party SDK accessing timestamps of files included in the SDK's own bundle or cache subfolder. | Probing host app file modification times. |
 | `DDA9.1` | Displaying file creation/modification dates directly to the end user in the app UI. | Sending modification timestamps to remote telemetry servers for device identification. |
 
-### 6.3 Category: System Boot Time (`NSPrivacyAccessedAPITypeSystemBootTime`)
+### 2.3 Category: System Boot Time (`NSPrivacyAccessedAPITypeSystemBootTime`)
 
 Covered APIs: `systemUptime`, `mach_absolute_time()`, `clock_gettime(CLOCK_MONOTONIC_RAW)`.
 
@@ -416,7 +61,7 @@ Covered APIs: `systemUptime`, `mach_absolute_time()`, `clock_gettime(CLOCK_MONOT
 | `35F4.1` | Measuring relative time elapsed between user interactions or internal performance milestones within the running session. | Recording boot time to identify or track the device across reboot cycles. |
 | `8FFB.1` | Calculating absolute timestamps for events that occurred while the app was running or backgrounded. | Exposing raw uptime to third-party ad networks. |
 
-### 6.4 Category: Disk Space (`NSPrivacyAccessedAPITypeDiskSpace`)
+### 2.4 Category: Disk Space (`NSPrivacyAccessedAPITypeDiskSpace`)
 
 Covered APIs: `statvfs`, `fstatvfs`, `NSURLVolumeAvailableCapacityKey`, `NSURLVolumeTotalCapacityKey`, `NSURLVolumeAvailableCapacityForImportantUsageKey`, `NSURLVolumeAvailableCapacityForOpportunisticUsageKey`.
 
@@ -427,7 +72,7 @@ Covered APIs: `statvfs`, `fstatvfs`, `NSURLVolumeAvailableCapacityKey`, `NSURLVo
 | `7D9E.1` | Crash reporting, diagnostics, and debugging to determine whether low-memory or out-of-disk conditions triggered a fault. | Telemetry transmission when storage conditions are normal. |
 | `B728.1` | Health check to manage local cache pruning and eviction policies. | Using remaining sector counts to differentiate devices. |
 
-### 6.5 Category: Active Keyboards (`NSPrivacyAccessedAPITypeActiveKeyboards`)
+### 2.5 Category: Active Keyboards (`NSPrivacyAccessedAPITypeActiveKeyboards`)
 
 Covered APIs: `UITextInputMode.activeInputModes`.
 
@@ -438,7 +83,7 @@ Covered APIs: `UITextInputMode.activeInputModes`.
 
 ---
 
-## 7. Production `PrivacyInfo.xcprivacy` Template
+## 3. Production `PrivacyInfo.xcprivacy` Template
 
 The following production-ready XML schema illustrates complete compliance for an enterprise app utilizing `UserDefaults`, disk space checks, and crash analytics:
 
@@ -533,7 +178,7 @@ The following production-ready XML schema illustrates complete compliance for an
 
 ---
 
-## 8. Automated Static Binary & Source Scanner Script
+## 4. Automated Static Binary & Source Scanner Script
 
 Use this shell script in your CI/CD pipeline or pre-commit hook to detect unauthorized required reason API invocations:
 
@@ -596,7 +241,7 @@ if [ -d "$APP_PATH" ]; then
 fi
 
 if [ "$FOUND_ISSUES" -gt 0 ]; then
-  echo "⚠️ Audit completed with $FOUND_ISSUES category/manifest findings. Ensure reasons are documented in PrivacyInfo.xcprivacy."
+  echo "⚠️ Audit completed with $FOUND_ISSUES findings. Ensure reasons are documented in PrivacyInfo.xcprivacy."
   exit 1
 else
   echo "🎉 Privacy audit passed with zero undeclared findings."
@@ -606,7 +251,91 @@ fi
 
 ---
 
-## 9. SPM Resource Bundling Configuration
+## 5. Detailed Submission Case Studies & Remedies
+
+### Case Study 01: ITMS-91053 Missing UserDefaults Declaration (`CA92.1`)
+
+#### Scenario Background
+An iOS utility application saving user interface preferences via `UserDefaults.standard` was flagged during automated App Store Connect ingest with rejection notice:
+```
+ITMS-91053: Missing API declaration in Privacy Manifest - Your app’s code in the target 'MyApp' references one or more APIs that require reasons, including NSPrivacyAccessedAPITypeUserDefaults.
+```
+
+#### Problem Analysis
+1. Binary symbol analysis via `nm` confirmed calls to `UserDefaults.standard.set(_:forKey:)`.
+2. The target lacked a `PrivacyInfo.xcprivacy` manifest, or the file was not included in the "Copy Bundle Resources" build phase.
+
+#### Resolution
+1. Created `Resources/PrivacyInfo.xcprivacy`.
+2. Added `NSPrivacyAccessedAPITypeUserDefaults` with authorized reason code `CA92.1` (accessing app's own user defaults).
+3. Ensured the privacy manifest is checked under target membership in the Xcode project inspector.
+4. Resubmitted archive to App Store Connect; ingest passed automatically.
+
+---
+
+### Case Study 02: ITMS-91053 Third-Party Framework File Timestamps (`0A2A.1`)
+
+#### Scenario Background
+An enterprise e-commerce app utilizing an embedded binary analytics framework failed validation:
+```
+ITMS-91053: Missing API declaration in Privacy Manifest - The binary 'Frameworks/VendorAnalytics.framework' references NSPrivacyAccessedAPITypeFileTimestamp without an authorized reason code.
+```
+
+#### Problem Analysis
+1. The third-party framework queried bundle asset creation timestamps via `stat64` or `NSURLContentModificationDateKey` to verify cached offline assets.
+2. The vendor had not yet released an updated framework containing a bundled `PrivacyInfo.xcprivacy`.
+
+#### Resolution
+1. Declared the third-party framework's required reason in the host application's top-level `PrivacyInfo.xcprivacy` as an interim mitigation:
+   - Type: `NSPrivacyAccessedAPITypeFileTimestamp`
+   - Reason: `0A2A.1` (third-party SDK accessing timestamps of files included in the SDK's own bundle).
+2. Contacted the vendor to procure the updated `.xcframework` with its own embedded manifest.
+
+---
+
+### Case Study 03: ITMS-91054 Invalid Reason Code Suffix Formatting
+
+#### Scenario Background
+A development team received an immediate rejection after uploading an archive:
+```
+ITMS-91054: Invalid Reason Code - In NSPrivacyAccessedAPITypeFileTimestamp, 'C617' is not a recognized reason code.
+```
+
+#### Problem Analysis
+The developer read Apple's human-readable documentation table and copied `C617` instead of the fully-qualified versioned identifier `C617.1`. Apple strictly enforces the `.1` version suffix.
+
+#### Resolution
+Updated `PrivacyInfo.xcprivacy`:
+```xml
+<dict>
+    <key>NSPrivacyAccessedAPIType</key>
+    <string>NSPrivacyAccessedAPITypeFileTimestamp</string>
+    <key>NSPrivacyAccessedAPITypeReasons</key>
+    <array>
+        <string>C617.1</string>
+    </array>
+</dict>
+```
+
+---
+
+### Case Study 04: ITMS-91055 Disk Space Verification Before Asset Unpacking (`E174.1`)
+
+#### Scenario Background
+A photo and video editor was rejected during manual review when the reviewer requested clarification regarding `NSPrivacyAccessedAPITypeDiskSpace`.
+
+#### Problem Analysis
+1. The app invoked `NSURLVolumeAvailableCapacityKey` to ensure at least 500MB of free space was available before expanding video archives.
+2. The privacy manifest declared disk space access, but the App Store reviewer flagged a mismatch between the declared reason code (`85F4.1` - display disk space to user) and the actual application UI (which did not display a disk space gauge).
+
+#### Resolution
+1. Corrected the reason code to `E174.1` (verifying sufficient disk space before creating or unpacking files).
+2. Added an explanatory note in App Review Information referencing the unzipping function in `AssetManager.swift`.
+3. Reviewer approved the submission on the subsequent pass.
+
+---
+
+## 6. SPM Resource Bundling Configuration
 
 When creating reusable Swift packages that access required reason APIs, the `PrivacyInfo.xcprivacy` must be explicitly declared as a resource in `Package.swift`:
 
@@ -639,7 +368,7 @@ let package = Package(
 
 ---
 
-## 10. App Store Submission Rejection Triage (`ITMS-91053` to `91055`)
+## 7. App Store Submission Rejection Triage (`ITMS-91053` to `91055`)
 
 | Error Code | Rejection Cause | Resolution Protocol |
 |---|---|---|
